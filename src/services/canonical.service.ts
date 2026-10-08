@@ -137,4 +137,42 @@ export class CanonicalService {
     const canonicalJson = JSON.stringify(canonicalObject, Object.keys(canonicalObject).sort());
     return crypto.createHash('sha256').update(canonicalJson).digest('hex');
   }
+
+  /**
+   * Generates a canonical SHA-256 hash for a deterministic settlement authorization.
+   * Binds tournament, settlement ID, agreement hash, ranking hash, asset, and recipient allocations.
+   */
+  public static computeSettlementHash(params: {
+    tournamentId: string;
+    settlementId: string;
+    agreementHash: string;
+    rankingHash: string;
+    prizeAsset: string;
+    recipients: Array<{
+      rank: number;
+      playerWallet: string;
+      amount: number;
+      allocationBps: number;
+    }>;
+  }): string {
+    const canonicalObject = {
+      agreementHash: params.agreementHash,
+      prizeAsset: params.prizeAsset,
+      rankingHash: params.rankingHash,
+      recipients: params.recipients
+        .map((r) => ({
+          allocationBps: Math.floor(r.allocationBps),
+          amount: Math.floor(r.amount),
+          playerWallet: r.playerWallet,
+          rank: Math.floor(r.rank),
+        }))
+        .sort((a, b) => a.rank - b.rank),
+      settlementId: params.settlementId,
+      tournamentId: params.tournamentId,
+    };
+
+    const canonicalJson = JSON.stringify(canonicalObject, Object.keys(canonicalObject).sort());
+    return crypto.createHash('sha256').update(canonicalJson).digest('hex');
+  }
 }
+

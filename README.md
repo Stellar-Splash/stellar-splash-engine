@@ -74,6 +74,15 @@ Stellar Splash is a skill-based gaming platform where creators fund tournament p
 - `POST /api/agreements/:tournamentId/:version/approve`: Creator approves specific agreement version and hash.
 - `POST /api/agreements/:tournamentId/:version/lock`: Lock agreement permanently (immutable financial rules).
 
+### Settlements & Multi-Recipient Payouts
+- `GET /api/settlements/:tournamentId/eligibility`: Evaluate strict multi-point settlement eligibility pipeline.
+- `GET /api/settlements/:tournamentId/preview`: Preview deterministic basis-point allocations, residual dust handling, and accounting invariants.
+- `POST /api/settlements/:tournamentId/authorize`: Cryptographically authorize settlement against exact agreement and ranking commitments.
+- `POST /api/settlements/:tournamentId/execute`: Submit multi-recipient Stellar Testnet transfers with real transaction tracking.
+- `GET /api/settlements/:tournamentId`: Retrieve settlement record, on-chain transaction batch, and reconciliation status.
+- `POST /api/settlements/:settlementId/reconcile`: Trigger independent verification comparing expected vs observed on-chain allocations.
+- `GET /api/settlements/player/:playerWallet`: Retrieve player's historical payouts with cryptographic attestations and explorer links.
+
 ### Games & Matches
 - `POST /api/games/start`: Initialize a game match session, generating an anti-cheat session token.
 - `POST /api/games/complete`: Ingest event stream, verify session, compute score, and persist canonical result (idempotent).

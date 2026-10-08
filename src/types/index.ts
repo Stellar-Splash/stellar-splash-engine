@@ -8,6 +8,8 @@ export type TournamentState =
   | 'VERIFYING'
   | 'VERIFIED'
   | 'FINALIZED'
+  | 'SETTLING'
+  | 'SETTLED'
   | 'COMPLETED'
   | 'CANCELLED';
 
@@ -30,6 +32,7 @@ export interface Tournament {
   fundingVerifiedAt?: number;
   activeAgreementVersion?: number;
   finalRankingHash?: string;
+  settlementId?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -236,4 +239,136 @@ export interface AuditEvent {
   eventType: string;
   actor: string;
   details: Record<string, unknown>;
+}
+
+// ----------------------------------------------------------------------
+// SETTLEMENT & PAYOUT TYPES
+// ----------------------------------------------------------------------
+
+export type SettlementStatus =
+  | 'CREATED'
+  | 'VALIDATING'
+  | 'CALCULATING'
+  | 'READY'
+  | 'AUTHORIZED'
+  | 'SUBMITTING'
+  | 'CONFIRMING'
+  | 'SETTLED'
+  | 'RECONCILED'
+  | 'PARTIALLY_SETTLED'
+  | 'FAILED'
+  | 'REQUIRES_RECONCILIATION'
+  | 'CANCELLED';
+
+export interface SettlementRecipient {
+  rank: number;
+  playerWallet: string;
+  allocationBps: number;
+  amount: number;
+  amountBaseUnits: number;
+  isResidualRecipient: boolean;
+  txHash?: string;
+  ledger?: number;
+  status: 'PENDING' | 'SUBMITTED' | 'CONFIRMED' | 'FAILED';
+  confirmedAt?: number;
+  failureReason?: string;
+}
+
+export interface SettlementSnapshot {
+  settlementId: string;
+  tournamentId: string;
+  agreementId: string;
+  agreementVersion: number;
+  agreementHash: string;
+  rankingId: string;
+  rankingVersion: number;
+  rankingHash: string;
+  prizePoolAmount: number;
+  prizeAsset: string;
+  assetIssuer?: string;
+  allocationRules: AllocationRule[];
+  roundingRule: string;
+  residualRule: string;
+  tieRule: string;
+  recipients: SettlementRecipient[];
+  grossPrizePool: number;
+  totalAllocated: number;
+  residualAmount: number;
+  createdAt: number;
+}
+
+export interface SettlementRecord {
+  settlementId: string;
+  tournamentId: string;
+  agreementId: string;
+  agreementVersion: number;
+  agreementHash: string;
+  rankingVersion: number;
+  rankingHash: string;
+  prizePoolAmount: number;
+  prizeAsset: string;
+  settlementHash: string;
+  status: SettlementStatus;
+  recipients: SettlementRecipient[];
+  grossPrizePool: number;
+  totalAllocated: number;
+  residualAmount: number;
+  snapshot: SettlementSnapshot;
+  authorizedBy?: string;
+  authorizedAt?: number;
+  executedAt?: number;
+  completedAt?: number;
+  reconciledAt?: number;
+  stellarTxHash?: string;
+  stellarLedger?: number;
+  explorerUrl?: string;
+  failureReason?: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface SettlementEligibilityResult {
+  eligible: boolean;
+  tournamentId: string;
+  reasons: string[];
+  agreement?: PrizeAgreement;
+  ranking?: FinalRankingRecord;
+  prizePoolFunding?: PrizePoolFunding;
+}
+
+export interface SettlementTransactionRecord {
+  id: string;
+  settlementId: string;
+  tournamentId: string;
+  recipientRank: number;
+  recipientWallet: string;
+  asset: string;
+  amount: number;
+  amountBaseUnits: number;
+  expectedAmount: number;
+  actualAmount: number;
+  txHash: string;
+  ledger?: number;
+  status: 'PENDING' | 'SUBMITTED' | 'CONFIRMED' | 'FAILED' | 'RECONCILIATION_REQUIRED';
+  submittedAt: number;
+  confirmedAt?: number;
+  failureCode?: string;
+  failureReason?: string;
+  explorerUrl: string;
+}
+
+export interface SettlementReconciliationRecord {
+  reconciliationId: string;
+  settlementId: string;
+  tournamentId: string;
+  expectedTotal: number;
+  observedTotal: number;
+  expectedRecipientCount: number;
+  observedRecipientCount: number;
+  matchedTransactions: number;
+  mismatchedTransactions: number;
+  status: 'RECONCILED' | 'MISMATCH' | 'REQUIRES_REVIEW' | 'PENDING';
+  details: string;
+  checkedAt: number;
+  discrepancies: string[];
 }

@@ -9,6 +9,10 @@ import {
   ResultVerification,
   FinalRankingRecord,
   PrizeAgreement,
+  SettlementRecord,
+  SettlementRecipient,
+  SettlementTransactionRecord,
+  SettlementReconciliationRecord,
 } from '../types';
 import { CONFIG } from '../config';
 import { AgreementService } from './agreement.service';
@@ -26,6 +30,11 @@ export class StoreService {
   private static verifications: Map<string, ResultVerification> = new Map(); // key: matchId
   private static rankings: Map<string, FinalRankingRecord> = new Map(); // key: tournamentId
   private static agreements: Map<string, PrizeAgreement[]> = new Map(); // key: tournamentId -> versions
+
+  // Settlement & Payout storage
+  private static settlements: Map<string, SettlementRecord> = new Map(); // key: settlementId
+  private static settlementTransactions: Map<string, SettlementTransactionRecord[]> = new Map(); // key: settlementId
+  private static settlementReconciliations: Map<string, SettlementReconciliationRecord> = new Map(); // key: settlementId
 
   static {
     // Seed initial featured tournament
@@ -442,4 +451,130 @@ export class StoreService {
   public static getAuditLogs(): AuditEvent[] {
     return [...this.auditLogs];
   }
+
+  // --- Settlements ---
+  public static saveSettlement(settlement: SettlementRecord): void {
+    settlement.updatedAt = Date.now();
+    this.settlements.set(settlement.settlementId, settlement);
+
+    const t = this.getTournamentById(settlement.tournamentId);
+    if (t) {
+      t.settlementId = settlement.settlementId;
+      if (settlement.status === 'SETTLED' || settlement.status === 'RECONCILED') {
+        t.state = 'SETTLED';
+      } else if (settlement.status === 'SUBMITTING' || settlement.status === 'CONFIRMING' || settlement.status === 'AUTHORIZED') {
+        t.state = 'SETTLING';
+      }
+      this.saveTournament(t);
+    }
+
+    this.logAudit('SETTLEMENT_SAVED', settlement.authorizedBy || 'SYSTEM', {
+      settlementId: settlement.settlementId,
+      tournamentId: settlement.tournamentId,
+      status: settlement.status,
+      settlementHash: settlement.settlementHash,
+    });
+  }
+
+  public static getSettlement(settlementId: string): SettlementRecord | undefined {
+    return this.settlements.get(settlementId);
+  }
+
+  public static getSettlementByTournament(tournamentId: string): SettlementRecord | undefined {
+    for (const s of this.settlements.values()) {
+      if (s.tournamentId === tournamentId) return s;
+    }
+    return undefined;
+  }
+
+  public static getAllSettlements(): SettlementRecord[] {
+    return Array.from(this.settlements.values()).sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  // --- Settlement Transactions ---
+  public static saveSettlementTransactions(settlementId: string, transactions: SettlementTransactionRecord[]): void {
+    this.settlementTransactions.set(settlementId, transactions);
+  }
+
+  public static getSettlementTransactions(settlementId: string): SettlementTransactionRecord[] {
+    return this.settlementTransactions.get(settlementId) || [];
+  }
+
+  // --- Settlement Reconciliation ---
+  public static saveSettlementReconciliation(rec: SettlementReconciliationRecord): void {
+    this.settlementReconciliations.set(rec.settlementId, rec);
+    this.logAudit('SETTLEMENT_RECONCILED', 'SYSTEM', {
+      settlementId: rec.settlementId,
+      status: rec.status,
+      expectedTotal: rec.expectedTotal,
+      observedTotal: rec.observedTotal,
+    });
+  }
+
+  public static getSettlementReconciliation(settlementId: string): SettlementReconciliationRecord | undefined {
+    return this.settlementReconciliations.get(settlementId);
+  }
+
+  // --- Player Payout History ---
+  public static getPlayerPayouts(playerWallet: string): Array<{
+    settlement: SettlementRecord;
+    recipient: SettlementRecipient;
+    tournament: Tournament;
+  }> {
+    const results: Array<{
+      settlement: SettlementRecord;
+      recipient: SettlementRecipient;
+      tournament: Tournament;
+    }> = [];
+
+    for (const settlement of this.settlements.values()) {
+      const recipient = settlement.recipients.find((r) => r.playerWallet === playerWallet);
+      if (recipient) {
+        const tournament = this.getTournamentById(settlement.tournamentId);
+        if (tournament) {
+          results.push({
+            settlement,
+            recipient,
+            tournament,
+          });
+        }
+      }
+    }
+
+    return results.sort((a, b) => b.settlement.createdAt - a.settlement.createdAt);
+  }
+
+  /**
+   * Resets test data for a specific tournament.
+   */
+  public static resetTournamentData(tournamentId: string): void {
+    this.tournaments.delete(tournamentId);
+    this.participants.delete(tournamentId);
+    this.rankings.delete(tournamentId);
+    this.agreements.delete(tournamentId);
+
+    for (const [mId, m] of Array.from(this.matches.entries())) {
+      if (m.tournamentId === tournamentId) {
+        this.matches.delete(mId);
+        this.results.delete(mId);
+        this.verifications.delete(mId);
+      }
+    }
+
+    for (const [tx, f] of Array.from(this.fundings.entries())) {
+      if (f.tournamentId === tournamentId) {
+        this.fundings.delete(tx);
+        this.consumedTxs.delete(tx);
+      }
+    }
+
+    for (const [sId, s] of Array.from(this.settlements.entries())) {
+      if (s.tournamentId === tournamentId) {
+        this.settlements.delete(sId);
+        this.settlementTransactions.delete(sId);
+        this.settlementReconciliations.delete(sId);
+      }
+    }
+  }
 }
+

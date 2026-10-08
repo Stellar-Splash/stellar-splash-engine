@@ -8,6 +8,7 @@ import eventsRoutes from './routes/events.routes';
 import verificationRoutes from './routes/verification.routes';
 import rankingRoutes from './routes/ranking.routes';
 import agreementRoutes from './routes/agreement.routes';
+import settlementRoutes from './routes/settlement.routes';
 
 export const createApp = (): Express => {
   const app = express();
@@ -34,6 +35,7 @@ export const createApp = (): Express => {
   app.use('/api/verification', verificationRoutes);
   app.use('/api/rankings', rankingRoutes);
   app.use('/api/agreements', agreementRoutes);
+  app.use('/api/settlements', settlementRoutes);
 
   // Global Error Handler
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
