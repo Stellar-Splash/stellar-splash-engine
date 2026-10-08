@@ -4,6 +4,10 @@ export type TournamentState =
   | 'OPEN'
   | 'FULL'
   | 'IN_PROGRESS'
+  | 'RESULTS_PENDING'
+  | 'VERIFYING'
+  | 'VERIFIED'
+  | 'FINALIZED'
   | 'COMPLETED'
   | 'CANCELLED';
 
@@ -15,7 +19,7 @@ export interface Tournament {
   gameVersion: string;
   creatorWallet: string;
   prizeAsset: string;
-  prizePoolAmount: number; // e.g. 100
+  prizePoolAmount: number;
   vaultAddress: string;
   maxParticipants: number;
   currentParticipants: number;
@@ -24,6 +28,8 @@ export interface Tournament {
   state: TournamentState;
   fundingTxHash?: string;
   fundingVerifiedAt?: number;
+  activeAgreementVersion?: number;
+  finalRankingHash?: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -37,7 +43,15 @@ export interface TournamentParticipant {
   status: 'ACTIVE' | 'DISQUALIFIED';
 }
 
-export type GameEventType = 'TARGET_HIT' | 'COMBO_STREAK' | 'HAZARD_HIT' | 'MULTIPLIER_UP';
+export type GameEventType =
+  | 'TARGET_HIT'
+  | 'TARGET_MISSED'
+  | 'COMBO_STREAK'
+  | 'COMBO_RESET'
+  | 'HAZARD_HIT'
+  | 'MULTIPLIER_UP'
+  | 'ROUND_STARTED'
+  | 'ROUND_ENDED';
 
 export interface GameEvent {
   seq: number;
@@ -49,6 +63,18 @@ export interface GameEvent {
   data?: Record<string, unknown>;
 }
 
+export type MatchStatus =
+  | 'CREATED'
+  | 'STARTED'
+  | 'PLAYING'
+  | 'COMPLETED'
+  | 'RESULT_PENDING'
+  | 'VERIFYING'
+  | 'VERIFIED'
+  | 'INVALID'
+  | 'REJECTED'
+  | 'VERIFICATION_FAILED';
+
 export interface MatchSession {
   matchId: string;
   tournamentId: string;
@@ -58,7 +84,8 @@ export interface MatchSession {
   sessionToken: string;
   startTime: number;
   endTime?: number;
-  status: 'STARTED' | 'COMPLETED' | 'EXPIRED' | 'REJECTED';
+  status: MatchStatus;
+  events?: GameEvent[];
 }
 
 export interface GameResult {
@@ -80,6 +107,104 @@ export interface GameResult {
   resultHash: string;
   submittedAt: number;
   verified: boolean;
+}
+
+// ----------------------------------------------------------------------
+// RESULT VERIFICATION & ATTESTATION TYPES
+// ----------------------------------------------------------------------
+
+export interface ResultVerification {
+  verificationId: string;
+  matchId: string;
+  tournamentId: string;
+  playerWallet: string;
+  gameVersion: string;
+  submittedScore: number;
+  replayedScore: number;
+  scoreMatch: boolean;
+  resultHash: string;
+  verificationAlgorithm: string;
+  verificationVersion: string;
+  verifier: string;
+  verifiedAt: number;
+  status: 'VERIFIED' | 'VERIFICATION_FAILED' | 'REJECTED';
+  rejectionReason?: string;
+  attestation?: ResultAttestation;
+}
+
+export interface ResultAttestation {
+  attestationId: string;
+  tournamentId: string;
+  matchId: string;
+  playerWallet: string;
+  resultHash: string;
+  finalScore: number;
+  verificationVersion: string;
+  verifierIdentity: string;
+  timestamp: number;
+  attestationDigest: string;
+}
+
+// ----------------------------------------------------------------------
+// TOURNAMENT RANKING TYPES
+// ----------------------------------------------------------------------
+
+export interface RankingEntry {
+  rank: number;
+  playerWallet: string;
+  score: number;
+  accuracy: number;
+  completedAt: number;
+  matchId: string;
+  resultHash: string;
+}
+
+export interface FinalRankingRecord {
+  tournamentId: string;
+  rankingVersion: number;
+  entries: RankingEntry[];
+  rankingHash: string;
+  finalizedAt: number;
+  finalizedBy: string;
+}
+
+// ----------------------------------------------------------------------
+// PRIZE AGREEMENT TYPES
+// ----------------------------------------------------------------------
+
+export type AgreementStatus =
+  | 'DRAFT'
+  | 'PENDING_APPROVAL'
+  | 'READY_TO_LOCK'
+  | 'LOCKED'
+  | 'SUPERSEDED'
+  | 'REJECTED';
+
+export interface AllocationRule {
+  rank: number;
+  basisPoints: number; // e.g. 5000 bps = 50.00%
+  label: string;
+}
+
+export interface PrizeAgreement {
+  agreementId: string;
+  tournamentId: string;
+  version: number;
+  prizeAsset: string;
+  prizePoolAmount: number;
+  rankingMethod: 'FINAL_VERIFIED_SCORE';
+  allocationRules: AllocationRule[];
+  tieRule: 'SCORE_THEN_ACCURACY_THEN_TIMESTAMP';
+  roundingRule: 'INTEGER_FLOOR_REMAINDER_TO_RANK_1';
+  residualRule: 'ALLOCATE_DUST_TO_FIRST_PLACE';
+  agreementHash: string;
+  status: AgreementStatus;
+  createdBy: string;
+  createdAt: number;
+  approvedBy?: string;
+  approvedAt?: number;
+  approvalSignature?: string;
+  lockedAt?: number;
 }
 
 export interface PrizePoolFunding {

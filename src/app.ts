@@ -5,6 +5,9 @@ import gameRoutes from './routes/game.routes';
 import prizePoolRoutes from './routes/prize-pool.routes';
 import reconciliationRoutes from './routes/reconciliation.routes';
 import eventsRoutes from './routes/events.routes';
+import verificationRoutes from './routes/verification.routes';
+import rankingRoutes from './routes/ranking.routes';
+import agreementRoutes from './routes/agreement.routes';
 
 export const createApp = (): Express => {
   const app = express();
@@ -28,6 +31,9 @@ export const createApp = (): Express => {
   app.use('/api/tournaments', prizePoolRoutes);
   app.use('/api/reconciliation', reconciliationRoutes);
   app.use('/api/events', eventsRoutes);
+  app.use('/api/verification', verificationRoutes);
+  app.use('/api/rankings', rankingRoutes);
+  app.use('/api/agreements', agreementRoutes);
 
   // Global Error Handler
   app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {

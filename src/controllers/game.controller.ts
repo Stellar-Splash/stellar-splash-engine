@@ -143,6 +143,7 @@ export class GameController {
     // Finalize session
     session.status = 'COMPLETED';
     session.endTime = endTime;
+    session.events = events as GameEvent[];
     StoreService.updateMatchSession(session);
 
     // Save canonical result

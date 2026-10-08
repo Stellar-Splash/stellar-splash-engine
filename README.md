@@ -59,6 +59,21 @@ Stellar Splash is a skill-based gaming platform where creators fund tournament p
 - `POST /api/tournaments/:id/join`: Register a player wallet into an open tournament.
 - `GET /api/tournaments/:id/leaderboard`: Query live tournament leaderboard. Explicitly separates **Current Score** from **Final Verified Result**.
 
+### Result Verification & Attestations
+- `POST /api/verification/match/:id`: Trigger independent replay verification of a completed match.
+- `GET /api/verification/match/:id`: Retrieve verification record and signed cryptographic attestation.
+
+### Tournament Rankings
+- `GET /api/rankings/:tournamentId`: Retrieve deterministic tournament ranking (or verified preview).
+- `POST /api/rankings/:tournamentId/finalize`: Finalize tournament ranking, committing to canonical ranking hash.
+
+### Prize Agreements & Financial Rules
+- `GET /api/agreements/:tournamentId`: List all versioned prize agreements for a tournament.
+- `GET /api/agreements/:tournamentId/active`: Retrieve the active (or LOCKED) prize agreement.
+- `POST /api/agreements`: Create a new prize agreement version (enforces 10,000 basis points rule).
+- `POST /api/agreements/:tournamentId/:version/approve`: Creator approves specific agreement version and hash.
+- `POST /api/agreements/:tournamentId/:version/lock`: Lock agreement permanently (immutable financial rules).
+
 ### Games & Matches
 - `POST /api/games/start`: Initialize a game match session, generating an anti-cheat session token.
 - `POST /api/games/complete`: Ingest event stream, verify session, compute score, and persist canonical result (idempotent).

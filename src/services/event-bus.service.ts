@@ -7,8 +7,13 @@ export type PlatformEventType =
   | 'PLAYER_JOINED'
   | 'MATCH_STARTED'
   | 'MATCH_COMPLETED'
+  | 'MATCH_VERIFIED'
   | 'LEADERBOARD_UPDATED'
-  | 'RECONCILIATION_UPDATED';
+  | 'RECONCILIATION_UPDATED'
+  | 'AGREEMENT_CREATED'
+  | 'AGREEMENT_APPROVED'
+  | 'AGREEMENT_LOCKED'
+  | 'RANKING_FINALIZED';
 
 export interface PlatformEventPayload {
   type: PlatformEventType;

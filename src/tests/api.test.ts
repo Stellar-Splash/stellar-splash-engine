@@ -122,4 +122,91 @@ describe('Stellar Splash Engine API', () => {
     expect(res.body.reconciliation.expectedAmount).toBe(100);
     expect(res.body.reconciliation.onChainAmount).toBe(100);
   });
+
+  it('Verification API: verify match, inspect verification record and attestation', async () => {
+    // 1. Verify seed match
+    const res = await request(app).post('/api/verification/match/match-genesis-001');
+    expect(res.status).toBe(200);
+    expect(res.body.verification.status).toBe('VERIFIED');
+    expect(res.body.verification.attestation).toBeDefined();
+
+    // 2. Fetch verification record
+    const getRes = await request(app).get('/api/verification/match/match-genesis-001');
+    expect(getRes.status).toBe(200);
+    expect(getRes.body.verification.resultHash).toBeDefined();
+  });
+
+  it('Prize Agreement API: list, create, approve, and lock agreement', async () => {
+    const tournamentId = 'tourn-splash-001';
+    const creatorWallet = 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB';
+
+    // 1. List existing agreements
+    const listRes = await request(app).get(`/api/agreements/${tournamentId}`);
+    expect(listRes.status).toBe(200);
+    expect(listRes.body.agreements.length).toBeGreaterThan(0);
+
+    // 2. Create version 2 with updated tiers
+    const createRes = await request(app)
+      .post('/api/agreements')
+      .send({
+        tournamentId,
+        version: 2,
+        prizeAsset: 'USDC',
+        prizePoolAmount: 100,
+        allocationRules: [
+          { rank: 1, basisPoints: 6000, label: '1st (60%)' },
+          { rank: 2, basisPoints: 2500, label: '2nd (25%)' },
+          { rank: 3, basisPoints: 1500, label: '3rd (15%)' },
+        ],
+        createdBy: creatorWallet,
+      });
+
+    expect(createRes.status).toBe(201);
+    expect(createRes.body.agreement.version).toBe(2);
+    expect(createRes.body.agreement.agreementHash).toBeDefined();
+
+    // 3. Approve version 2
+    const approveRes = await request(app)
+      .post(`/api/agreements/${tournamentId}/2/approve`)
+      .send({ approverWallet: creatorWallet });
+    expect(approveRes.status).toBe(200);
+    expect(approveRes.body.agreement.status).toBe('READY_TO_LOCK');
+
+    // 4. Lock version 2
+    const lockRes = await request(app)
+      .post(`/api/agreements/${tournamentId}/2/lock`)
+      .send({ actorWallet: creatorWallet });
+    expect(lockRes.status).toBe(200);
+    expect(lockRes.body.agreement.status).toBe('LOCKED');
+
+    // 5. Verify active agreement is now version 2
+    const activeRes = await request(app).get(`/api/agreements/${tournamentId}/active`);
+    expect(activeRes.status).toBe(200);
+    expect(activeRes.body.agreement.version).toBe(2);
+    expect(activeRes.body.agreement.status).toBe('LOCKED');
+  });
+
+  it('Rankings API: view verified ranking preview and finalize rankings', async () => {
+    const tournamentId = 'tourn-splash-001';
+    const creatorWallet = 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB';
+
+    // 1. Get preview ranking
+    const getRes = await request(app).get(`/api/rankings/${tournamentId}`);
+    expect(getRes.status).toBe(200);
+    expect(getRes.body.ranking.entries.length).toBeGreaterThan(0);
+
+    // 2. Finalize ranking
+    const finalizeRes = await request(app)
+      .post(`/api/rankings/${tournamentId}/finalize`)
+      .send({ finalizedBy: creatorWallet });
+    expect(finalizeRes.status).toBe(201);
+    expect(finalizeRes.body.ranking.rankingHash).toHaveLength(64);
+
+    // 3. Immutability: Attempting to finalize again returns 409
+    const secondFinalize = await request(app)
+      .post(`/api/rankings/${tournamentId}/finalize`)
+      .send({ finalizedBy: creatorWallet });
+    expect(secondFinalize.status).toBe(409);
+  });
 });
+
