@@ -178,4 +178,38 @@ export class GameController {
 
     res.json({ success: true, result });
   }
+
+  /**
+   * Exports full match audit payload including session parameters, event stream,
+   * score breakdown, and cryptographic verification status for independent auditing.
+   */
+  public static exportMatchReplay(req: Request, res: Response): void {
+    const { id } = req.params;
+    const session = StoreService.getMatchSession(id);
+    const result = StoreService.getGameResult(id);
+
+    if (!session && !result) {
+      res.status(404).json({ success: false, error: 'Match not found for replay export' });
+      return;
+    }
+
+    const verification = StoreService.getVerification(id);
+
+    res.json({
+      success: true,
+      matchId: id,
+      tournamentId: session?.tournamentId || result?.tournamentId,
+      playerWallet: session?.playerWallet || result?.playerWallet,
+      gameId: session?.gameId || 'splash-rush',
+      gameVersion: session?.gameVersion || result?.gameVersion,
+      startTime: session?.startTime || result?.startTime,
+      endTime: session?.endTime || result?.endTime,
+      durationMs: result?.durationMs,
+      result: result || null,
+      events: session?.events || [],
+      eventsCount: session?.events?.length || result?.eventsCount || 0,
+      verification: verification || null,
+      exportedAt: Date.now(),
+    });
+  }
 }

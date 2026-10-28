@@ -106,7 +106,16 @@ describe('Stellar Splash Engine API', () => {
     expect(reSubmitRes.status).toBe(200);
     expect(reSubmitRes.body.message).toContain('idempotent');
 
-    // 4. Verify leaderboard reflects score
+    // 4. Export match replay for transparent auditing
+    const exportRes = await request(app).get(`/api/games/matches/${matchId}/export`);
+    expect(exportRes.status).toBe(200);
+    expect(exportRes.body.success).toBe(true);
+    expect(exportRes.body.matchId).toBe(matchId);
+    expect(exportRes.body.events.length).toBe(3);
+    expect(exportRes.body.result).toBeDefined();
+    expect(exportRes.body.result.resultHash).toBe(completeRes.body.result.resultHash);
+
+    // 5. Verify leaderboard reflects score
     const lbRes = await request(app).get('/api/tournaments/tourn-splash-001/leaderboard');
     expect(lbRes.status).toBe(200);
     const entry = lbRes.body.leaderboard.find((e: { playerWallet: string }) => e.playerWallet === playerWallet);

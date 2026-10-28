@@ -6,5 +6,6 @@ const router = Router();
 router.post('/start', GameController.startGame);
 router.post('/complete', GameController.completeGame);
 router.get('/matches/:id/result', GameController.getMatchResult);
+router.get('/matches/:id/export', GameController.exportMatchReplay);
 
 export default router;
