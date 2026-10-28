@@ -58,4 +58,42 @@ describe('ScoringService', () => {
     expect(result1.resultHash.length).toBe(64); // 256-bit SHA-256 hex string
     expect(result1.finalScore).toBe(310); // 100 + 200 + (2 * 5) = 310
   });
+
+  it('calculates deterministic 10,000 bps prize shares and awards fractional dust to Rank 1', () => {
+    const allocations = [
+      { rank: 1, basisPoints: 5000 },
+      { rank: 2, basisPoints: 3000 },
+      { rank: 3, basisPoints: 2000 },
+    ];
+
+    // Total: 10,001 Stroops -> Dust = 1 Stroop
+    const totalPrize = 10_001n;
+    const shares = ScoringService.calculatePrizePoolBpsShares(totalPrize, allocations);
+
+    expect(shares.length).toBe(3);
+    expect(shares[0].rank).toBe(1);
+    expect(shares[0].shareStroops).toBe(5001n);
+    expect(shares[0].isDustRecipient).toBe(true);
+
+    expect(shares[1].rank).toBe(2);
+    expect(shares[1].shareStroops).toBe(3000n);
+    expect(shares[1].isDustRecipient).toBe(false);
+
+    expect(shares[2].rank).toBe(3);
+    expect(shares[2].shareStroops).toBe(2000n);
+
+    // Sum invariant
+    const sum = shares.reduce((acc, curr) => acc + curr.shareStroops, 0n);
+    expect(sum).toBe(totalPrize);
+  });
+
+  it('throws an error when basis points do not sum to 10,000', () => {
+    const invalid = [
+      { rank: 1, basisPoints: 5000 },
+      { rank: 2, basisPoints: 4999 },
+    ];
+    expect(() => ScoringService.calculatePrizePoolBpsShares(100_000n, invalid)).toThrow(
+      'INVALID_BPS_SUM'
+    );
+  });
 });

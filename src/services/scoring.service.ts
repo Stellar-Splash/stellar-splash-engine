@@ -161,4 +161,39 @@ export class ScoringService {
       verified: true,
     };
   }
+
+  /**
+   * Financial governance calculation enforcing exact 10,000 basis points distribution
+   * with integer floor arithmetic and deterministic residual dust credit to Rank 1.
+   */
+  public static calculatePrizePoolBpsShares(
+    totalPrizeStroops: bigint,
+    allocations: Array<{ rank: number; basisPoints: number }>
+  ): Array<{ rank: number; basisPoints: number; shareStroops: bigint; isDustRecipient: boolean }> {
+    const totalBps = allocations.reduce((sum, item) => sum + item.basisPoints, 0);
+    if (totalBps !== 10_000) {
+      throw new Error(`INVALID_BPS_SUM: Basis points sum (${totalBps}) must equal exactly 10,000 bps.`);
+    }
+
+    const sorted = [...allocations].sort((a, b) => a.rank - b.rank);
+    let distributed = 0n;
+    const initialShares = sorted.map((alloc) => {
+      const share = (totalPrizeStroops * BigInt(alloc.basisPoints)) / 10_000n;
+      distributed += share;
+      return {
+        rank: alloc.rank,
+        basisPoints: alloc.basisPoints,
+        shareStroops: share,
+        isDustRecipient: false,
+      };
+    });
+
+    const dust = totalPrizeStroops - distributed;
+    if (dust > 0n && initialShares.length > 0) {
+      initialShares[0].shareStroops += dust;
+      initialShares[0].isDustRecipient = true;
+    }
+
+    return initialShares;
+  }
 }
