@@ -7,6 +7,8 @@ import { CONFIG } from '../config';
 export class ReplayService {
   public static VERIFICATION_VERSION = '1.0.0';
   public static VERIFIER_IDENTITY = 'verifier.stellar-splash.org';
+  public static EXPECTED_ROUND_DURATION_MS = 45000;
+  public static DURATION_TOLERANCE_MS = 2000;
 
   /**
    * Logs a structured anti-cheat fraud detection flag into the audit system.
@@ -204,7 +206,37 @@ export class ReplayService {
       }
     }
 
-    // 5. Independently replay event stream
+    // 5. Match duration validation (prevent speed hacks, paused clock exploits, and truncated rounds)
+    const elapsedMs = submittedResult.endTime - submittedResult.startTime;
+    const durationDelta = Math.abs(elapsedMs - ReplayService.EXPECTED_ROUND_DURATION_MS);
+    if (durationDelta > ReplayService.DURATION_TOLERANCE_MS) {
+      const rejectionReason = `INVALID_MATCH_DURATION: Match duration ${elapsedMs}ms deviates from expected round duration (${ReplayService.EXPECTED_ROUND_DURATION_MS}ms) by ${durationDelta}ms, exceeding tolerance (${ReplayService.DURATION_TOLERANCE_MS}ms).`;
+      ReplayService.logFraudFlag(session, 'INVALID_MATCH_DURATION', rejectionReason, {
+        elapsedMs,
+        expectedDurationMs: ReplayService.EXPECTED_ROUND_DURATION_MS,
+        durationDelta,
+        toleranceMs: ReplayService.DURATION_TOLERANCE_MS,
+      });
+      return {
+        verificationId,
+        matchId: session.matchId,
+        tournamentId: session.tournamentId,
+        playerWallet: session.playerWallet,
+        gameVersion: session.gameVersion,
+        submittedScore: submittedResult.finalScore,
+        replayedScore: 0,
+        scoreMatch: false,
+        resultHash: submittedResult.resultHash,
+        verificationAlgorithm: 'DETERMINISTIC_REPLAY_ENGINE',
+        verificationVersion: ReplayService.VERIFICATION_VERSION,
+        verifier: ReplayService.VERIFIER_IDENTITY,
+        verifiedAt: Date.now(),
+        status: 'REJECTED',
+        rejectionReason,
+      };
+    }
+
+    // 6. Independently replay event stream
     const breakdown = ScoringService.calculateScore(events);
     const replayedScore = breakdown.finalScore;
 

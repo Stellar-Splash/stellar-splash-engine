@@ -180,4 +180,42 @@ describe('Deterministic Replay & Verification Engine', () => {
     expect(lastFraud.eventType).toBe('ANTI_CHEAT_FRAUD_FLAG');
     expect((lastFraud.details as any).reasonCode).toBe('UNSUPPORTED_GAME_VERSION');
   });
+
+  it('rejects truncated or speed-hacked matches deviating by > 2000ms from 45s round duration', () => {
+    // 20s match instead of 45s
+    const truncatedResult = {
+      ...validResult,
+      endTime: session.startTime + 20000,
+      durationMs: 20000,
+    };
+
+    const verification = ReplayService.verifyMatch(session, truncatedResult, validEvents);
+    expect(verification.status).toBe('REJECTED');
+    expect(verification.rejectionReason).toContain('INVALID_MATCH_DURATION');
+  });
+
+  it('rejects extended or frozen timer matches exceeding duration tolerance', () => {
+    // 60s match instead of 45s
+    const extendedResult = {
+      ...validResult,
+      endTime: session.startTime + 60000,
+      durationMs: 60000,
+    };
+
+    const verification = ReplayService.verifyMatch(session, extendedResult, validEvents);
+    expect(verification.status).toBe('REJECTED');
+    expect(verification.rejectionReason).toContain('INVALID_MATCH_DURATION');
+  });
+
+  it('accepts legitimate match duration within +/- 2000ms tolerance', () => {
+    // 45.8s match (network delay)
+    const tolerantResult = {
+      ...validResult,
+      endTime: session.startTime + 45800,
+      durationMs: 45800,
+    };
+
+    const verification = ReplayService.verifyMatch(session, tolerantResult, validEvents);
+    expect(verification.status).toBe('VERIFIED');
+  });
 });
