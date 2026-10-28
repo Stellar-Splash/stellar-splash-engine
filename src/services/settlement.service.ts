@@ -147,7 +147,7 @@ export class SettlementService {
     }
 
     // 6. Valid asset
-    if (agreement && !CONFIG.SUPPORTED_ASSETS.includes(agreement.prizeAsset)) {
+    if (agreement && !(CONFIG.SUPPORTED_ASSETS as readonly string[]).includes(agreement.prizeAsset)) {
       reasons.push(`INVALID_PRIZE_ASSET: Asset '${agreement.prizeAsset}' is not supported for settlement.`);
     }
 
