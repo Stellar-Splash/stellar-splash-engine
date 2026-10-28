@@ -5,11 +5,17 @@ import { createApp } from '../app';
 const app = createApp();
 
 describe('Stellar Splash Engine API', () => {
-  it('GET /api/health returns operational status', async () => {
+  it('GET /api/health returns operational status and telemetry metrics', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);
     expect(res.body.status).toBe('ok');
-    expect(res.body.network).toBe('Stellar Testnet');
+    expect(res.body.service).toBe('stellar-splash-engine');
+    expect(res.body.network).toBe('TESTNET');
+    expect(typeof res.body.uptimeSeconds).toBe('number');
+    expect(res.body.memory.rssMb).toBeGreaterThan(0);
+    expect(res.body.memory.heapUsedMb).toBeGreaterThan(0);
+    expect(res.body.process.nodeVersion).toBeDefined();
+    expect(res.body.soroban.contractId).toBe('CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ');
   });
 
   it('GET /api/tournaments lists tournaments with initial seed', async () => {

@@ -11,6 +11,7 @@ import agreementRoutes from './routes/agreement.routes';
 import settlementRoutes from './routes/settlement.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 import { createRateLimiter } from './middleware/rate-limiter.middleware';
+import { CONFIG } from './config';
 
 export const createApp = (): Express => {
   const app = express();
@@ -19,12 +20,31 @@ export const createApp = (): Express => {
   app.use(express.json({ limit: '1mb' }));
   app.use(createRateLimiter({ windowMs: 60_000, maxRequests: 200 }));
 
-  // Health check endpoint
+  // Comprehensive Health & Telemetry Endpoint
   app.get('/api/health', (_req: Request, res: Response) => {
+    const mem = process.memoryUsage();
     res.json({
       status: 'ok',
       service: 'stellar-splash-engine',
-      network: 'Stellar Testnet',
+      version: '1.0.0',
+      network: CONFIG.STELLAR_NETWORK,
+      environment: CONFIG.NODE_ENV,
+      uptimeSeconds: Math.floor(process.uptime()),
+      memory: {
+        rssMb: Math.round((mem.rss / 1024 / 1024) * 100) / 100,
+        heapTotalMb: Math.round((mem.heapTotal / 1024 / 1024) * 100) / 100,
+        heapUsedMb: Math.round((mem.heapUsed / 1024 / 1024) * 100) / 100,
+        externalMb: Math.round((mem.external / 1024 / 1024) * 100) / 100,
+      },
+      process: {
+        nodeVersion: process.version,
+        pid: process.pid,
+      },
+      soroban: {
+        contractId: CONFIG.CONTRACT_ID,
+        rpcUrl: CONFIG.SOROBAN_RPC_URL,
+        horizonUrl: CONFIG.HORIZON_URL,
+      },
       timestamp: Date.now(),
     });
   });
