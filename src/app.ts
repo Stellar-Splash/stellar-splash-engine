@@ -11,6 +11,7 @@ import agreementRoutes from './routes/agreement.routes';
 import settlementRoutes from './routes/settlement.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 import { createRateLimiter } from './middleware/rate-limiter.middleware';
+import { MetricsService } from './services/metrics.service';
 import { CONFIG } from './config';
 
 export const createApp = (): Express => {
@@ -19,6 +20,20 @@ export const createApp = (): Express => {
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
   app.use(createRateLimiter({ windowMs: 60_000, maxRequests: 200 }));
+
+  // Prometheus Metrics Tracking Middleware
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.on('finish', () => {
+      MetricsService.recordHttpRequest(req.method, req.path, res.statusCode);
+    });
+    next();
+  });
+
+  // Prometheus Metrics Exposition Endpoint
+  app.get('/api/metrics', (_req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
+    res.send(MetricsService.formatPrometheusMetrics());
+  });
 
   // Comprehensive Health & Telemetry Endpoint
   app.get('/api/health', (_req: Request, res: Response) => {
