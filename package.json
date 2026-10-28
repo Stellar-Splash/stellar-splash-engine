@@ -19,6 +19,10 @@
   ],
   "author": "Stellar Splash Team",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
     "@stellar/stellar-sdk": "^12.3.0",
     "cors": "^2.8.5",
