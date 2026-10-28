@@ -174,5 +174,13 @@ describe('Deterministic Tournament Rankings Engine', () => {
 
     expect(hash1).toBe(hash2);
     expect(hash1.length).toBe(64);
+
+    const bytes = RankingService.generateRankingHashBytes(tournamentId, 1, entries);
+    expect(bytes).toBeInstanceOf(Buffer);
+    expect(bytes.length).toBe(32);
+    expect(bytes.toString('hex')).toBe(hash1);
+
+    expect(RankingService.verifyRankingHash(hash1, tournamentId, 1, entries)).toBe(true);
+    expect(RankingService.verifyRankingHash('deadbeef'.repeat(8), tournamentId, 1, entries)).toBe(false);
   });
 });

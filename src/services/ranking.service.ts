@@ -80,6 +80,32 @@ export class RankingService {
   }
 
   /**
+   * Generates a 32-byte raw binary buffer representing the canonical ranking hash,
+   * directly compatible with Soroban BytesN<32> host argument types.
+   */
+  public static generateRankingHashBytes(
+    tournamentId: string,
+    version: number,
+    entries: RankingEntry[]
+  ): Buffer {
+    const hex = this.generateRankingHash(tournamentId, version, entries);
+    return Buffer.from(hex, 'hex');
+  }
+
+  /**
+   * Verifies whether an external ranking hash matches the canonical ranking hash.
+   */
+  public static verifyRankingHash(
+    expectedHash: string,
+    tournamentId: string,
+    version: number,
+    entries: RankingEntry[]
+  ): boolean {
+    const computed = this.generateRankingHash(tournamentId, version, entries);
+    return computed.toLowerCase() === expectedHash.toLowerCase();
+  }
+
+  /**
    * Finalizes the tournament ranking and commits to canonical ranking hash.
    */
   public static finalizeTournamentRanking(
