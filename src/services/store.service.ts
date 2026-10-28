@@ -590,5 +590,54 @@ export class StoreService {
       }
     }
   }
+
+  /**
+   * Exports full storage state into a serializable snapshot object.
+   */
+  public static exportAll(): Record<string, any> {
+    return {
+      version: 1,
+      exportedAt: Date.now(),
+      tournaments: Array.from(this.tournaments.values()),
+      participants: Array.from(this.participants.entries()),
+      matches: Array.from(this.matches.values()),
+      results: Array.from(this.results.values()),
+      verifications: Array.from(this.verifications.values()),
+      rankings: Array.from(this.rankings.values()),
+      agreements: Array.from(this.agreements.entries()),
+      settlements: Array.from(this.settlements.values()),
+      auditLogs: this.auditLogs,
+    };
+  }
+
+  /**
+   * Imports full storage state from a snapshot object.
+   */
+  public static importAll(data: Record<string, any>): void {
+    if (!data) return;
+    if (Array.isArray(data.tournaments)) {
+      this.tournaments.clear();
+      for (const t of data.tournaments) this.tournaments.set(t.id, t);
+    }
+    if (Array.isArray(data.participants)) {
+      this.participants.clear();
+      for (const [id, parts] of data.participants) this.participants.set(id, parts);
+    }
+    if (Array.isArray(data.matches)) {
+      this.matches.clear();
+      for (const m of data.matches) this.matches.set(m.matchId, m);
+    }
+    if (Array.isArray(data.results)) {
+      this.results.clear();
+      for (const r of data.results) this.results.set(r.matchId, r);
+    }
+    if (Array.isArray(data.settlements)) {
+      this.settlements.clear();
+      for (const s of data.settlements) this.settlements.set(s.settlementId, s);
+    }
+    if (Array.isArray(data.auditLogs)) {
+      this.auditLogs = data.auditLogs;
+    }
+  }
 }
 
