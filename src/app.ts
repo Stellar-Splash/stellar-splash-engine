@@ -9,6 +9,7 @@ import verificationRoutes from './routes/verification.routes';
 import rankingRoutes from './routes/ranking.routes';
 import agreementRoutes from './routes/agreement.routes';
 import settlementRoutes from './routes/settlement.routes';
+import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 
 export const createApp = (): Express => {
   const app = express();
@@ -37,15 +38,11 @@ export const createApp = (): Express => {
   app.use('/api/agreements', agreementRoutes);
   app.use('/api/settlements', settlementRoutes);
 
+  // 404 Catch-All Handler
+  app.use(notFoundHandler);
+
   // Global Error Handler
-  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error('[Engine Error]:', err);
-    res.status(500).json({
-      success: false,
-      error: 'INTERNAL_SERVER_ERROR',
-      message: err.message,
-    });
-  });
+  app.use(errorHandler);
 
   return app;
 };
