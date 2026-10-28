@@ -122,6 +122,26 @@ describe('Stellar Splash Engine API', () => {
     expect(entry).toBeDefined();
     expect(entry.currentScore).toBe(completeRes.body.result.finalScore);
     expect(entry.scoreLabel).toBe('Current Score');
+
+    // 6. Replay attack rejection: Another match attempting to submit duplicate event stream
+    const player2 = 'GB6V2A73VUX6KAZD66N6E64B44J7K3XW6P2W3V7QOXWCV7T4KQL3ZPL2';
+    await request(app).post('/api/tournaments/tourn-splash-001/join').send({ playerWallet: player2 });
+    const start2 = await request(app).post('/api/games/start').send({
+      tournamentId: 'tourn-splash-001',
+      playerWallet: player2,
+    });
+    const replayAttackRes = await request(app).post('/api/games/complete').send({
+      matchId: start2.body.match.matchId,
+      sessionToken: start2.body.match.sessionToken,
+      endTime: Date.now() + 45000,
+      events: [
+        { seq: 1, timestamp: 1000, type: 'TARGET_HIT', points: 200, combo: 1, multiplier: 1 },
+        { seq: 2, timestamp: 2000, type: 'TARGET_HIT', points: 300, combo: 2, multiplier: 2 },
+        { seq: 3, timestamp: 3000, type: 'HAZARD_HIT', points: 50, combo: 0, multiplier: 1 },
+      ],
+    });
+    expect(replayAttackRes.status).toBe(409);
+    expect(replayAttackRes.body.error).toContain('REPLAY_ATTACK_DETECTED');
   });
 
   it('GET /api/reconciliation returns reconciled status for funded tournaments', async () => {

@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { z } from 'zod';
 import { StoreService } from '../services/store.service';
 import { ScoringService } from '../services/scoring.service';
+import { CanonicalService } from '../services/canonical.service';
 import { EventBusService } from '../services/event-bus.service';
 import { MatchSession, GameEvent } from '../types';
 import { CONFIG } from '../config';
@@ -135,6 +136,25 @@ export class GameController {
     if (endTime < session.startTime) {
       res.status(400).json({ success: false, error: 'End time cannot be earlier than start time' });
       return;
+    }
+
+    // Replay attack prevention: Compute deterministic fingerprint for event stream
+    if (events.length > 0) {
+      const canonicalEvents = CanonicalService.canonicalSerialize(
+        CanonicalService.normalizeEvents(events as GameEvent[])
+      );
+      const eventFingerprint = crypto.createHash('sha256').update(canonicalEvents).digest('hex');
+
+      const existingMatch = StoreService.getEventStreamMatch(eventFingerprint);
+      if (existingMatch && existingMatch !== matchId) {
+        res.status(409).json({
+          success: false,
+          error: `REPLAY_ATTACK_DETECTED: This exact event sequence has already been submitted for match ${existingMatch}.`,
+        });
+        return;
+      }
+
+      StoreService.markEventStreamConsumed(eventFingerprint, matchId);
     }
 
     // Deterministically build and verify game result from event stream

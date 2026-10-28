@@ -24,6 +24,7 @@ export class StoreService {
   private static results: Map<string, GameResult> = new Map();
   private static fundings: Map<string, PrizePoolFunding> = new Map(); // key: txHash
   private static consumedTxs: Set<string> = new Set();
+  private static consumedEventStreams: Map<string, string> = new Map(); // key: fingerprint -> matchId
   private static auditLogs: AuditEvent[] = [];
 
   // Verification & Agreement storage
@@ -282,6 +283,19 @@ export class StoreService {
     return Array.from(this.results.values())
       .filter((r) => r.tournamentId === tournamentId)
       .sort((a, b) => b.finalScore - a.finalScore);
+  }
+
+  // --- Replay Attack Prevention ---
+  public static isEventStreamConsumed(fingerprint: string): boolean {
+    return this.consumedEventStreams.has(fingerprint);
+  }
+
+  public static getEventStreamMatch(fingerprint: string): string | undefined {
+    return this.consumedEventStreams.get(fingerprint);
+  }
+
+  public static markEventStreamConsumed(fingerprint: string, matchId: string): void {
+    this.consumedEventStreams.set(fingerprint, matchId);
   }
 
   // --- Verifications ---
