@@ -10,12 +10,14 @@ import rankingRoutes from './routes/ranking.routes';
 import agreementRoutes from './routes/agreement.routes';
 import settlementRoutes from './routes/settlement.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
+import { createRateLimiter } from './middleware/rate-limiter.middleware';
 
 export const createApp = (): Express => {
   const app = express();
 
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
+  app.use(createRateLimiter({ windowMs: 60_000, maxRequests: 200 }));
 
   // Health check endpoint
   app.get('/api/health', (_req: Request, res: Response) => {
