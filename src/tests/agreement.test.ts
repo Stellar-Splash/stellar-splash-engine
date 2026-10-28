@@ -120,4 +120,32 @@ describe('Prize Agreement Financial Rules & Invariants', () => {
       StoreService.saveAgreement(mutated);
     }).toThrow(/Locked agreements cannot be modified/);
   });
+
+  it('rejects invalid parameters and payloads via Zod schema validation', async () => {
+    const { createApp } = await import('../app');
+    const request = (await import('supertest')).default;
+    const app = createApp();
+
+    // 1. Invalid version in URL params (non-numeric)
+    const resBadParam = await request(app).post('/api/agreements/tourn-1/not-a-number/approve').send({
+      approverWallet: 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
+    });
+    expect(resBadParam.status).toBe(400);
+    expect(resBadParam.body.success).toBe(false);
+
+    // 2. Invalid basis points in POST /api/agreements payload (sum != 10000)
+    const resBadPayload = await request(app).post('/api/agreements').send({
+      tournamentId: 'tourn-splash-001',
+      version: 1,
+      prizeAsset: 'USDC',
+      prizePoolAmount: 100,
+      allocationRules: [
+        { rank: 1, basisPoints: 8000, label: '1st' }, // 8000 != 10000
+      ],
+      createdBy: 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
+    });
+    expect(resBadPayload.status).toBe(400);
+    expect(resBadPayload.body.success).toBe(false);
+    expect(JSON.stringify(resBadPayload.body.errors)).toContain('Sum of basis points across all allocation rules must equal exactly 10,000');
+  });
 });

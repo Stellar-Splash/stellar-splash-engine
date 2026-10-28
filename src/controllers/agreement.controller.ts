@@ -4,27 +4,45 @@ import { StoreService } from '../services/store.service';
 import { AgreementService } from '../services/agreement.service';
 import { EventBusService } from '../services/event-bus.service';
 
-const CreateAgreementSchema = z.object({
-  tournamentId: z.string(),
+export const TournamentIdParamSchema = z.object({
+  tournamentId: z.string().min(3).max(64),
+});
+
+export const AgreementParamsSchema = z.object({
+  tournamentId: z.string().min(3).max(64),
+  version: z.coerce.number().int().positive(),
+});
+
+export const CreateAgreementSchema = z.object({
+  tournamentId: z.string().min(3).max(64),
   version: z.number().int().positive(),
-  prizeAsset: z.string().min(1),
+  prizeAsset: z.enum(['XLM', 'USDC']),
   prizePoolAmount: z.number().positive(),
-  allocationRules: z.array(
-    z.object({
-      rank: z.number().int().positive(),
-      basisPoints: z.number().int().min(1).max(10000),
-      label: z.string(),
-    })
-  ).min(1),
+  allocationRules: z
+    .array(
+      z.object({
+        rank: z.number().int().positive(),
+        basisPoints: z.number().int().min(1).max(10000),
+        label: z.string().min(1).max(64),
+      })
+    )
+    .min(1)
+    .refine(
+      (rules) => {
+        const sum = rules.reduce((acc, r) => acc + r.basisPoints, 0);
+        return sum === 10000;
+      },
+      { message: 'Sum of basis points across all allocation rules must equal exactly 10,000 (100.00%)' }
+    ),
   createdBy: z.string().min(56).max(56),
 });
 
-const ApproveAgreementSchema = z.object({
+export const ApproveAgreementSchema = z.object({
   approverWallet: z.string().min(56).max(56),
   signature: z.string().optional(),
 });
 
-const LockAgreementSchema = z.object({
+export const LockAgreementSchema = z.object({
   actorWallet: z.string().min(56).max(56),
 });
 
@@ -33,7 +51,12 @@ export class AgreementController {
    * Retrieves all prize agreement versions for a tournament.
    */
   public static getTournamentAgreements(req: Request, res: Response): void {
-    const { tournamentId } = req.params;
+    const paramResult = TournamentIdParamSchema.safeParse(req.params);
+    if (!paramResult.success) {
+      res.status(400).json({ success: false, errors: paramResult.error.errors });
+      return;
+    }
+    const { tournamentId } = paramResult.data;
     const agreements = StoreService.getAgreementsForTournament(tournamentId);
 
     res.json({
@@ -46,7 +69,12 @@ export class AgreementController {
    * Retrieves the active (LOCKED or latest) prize agreement for a tournament.
    */
   public static getActiveAgreement(req: Request, res: Response): void {
-    const { tournamentId } = req.params;
+    const paramResult = TournamentIdParamSchema.safeParse(req.params);
+    if (!paramResult.success) {
+      res.status(400).json({ success: false, errors: paramResult.error.errors });
+      return;
+    }
+    const { tournamentId } = paramResult.data;
     const agreement = StoreService.getActiveAgreement(tournamentId);
 
     if (!agreement) {
@@ -124,8 +152,12 @@ export class AgreementController {
    * Creator approves a specific agreement version and hash.
    */
   public static approveAgreement(req: Request, res: Response): void {
-    const { tournamentId, version } = req.params;
-    const versionNum = parseInt(version, 10);
+    const paramResult = AgreementParamsSchema.safeParse(req.params);
+    if (!paramResult.success) {
+      res.status(400).json({ success: false, errors: paramResult.error.errors });
+      return;
+    }
+    const { tournamentId, version: versionNum } = paramResult.data;
 
     const parseResult = ApproveAgreementSchema.safeParse(req.body);
     if (!parseResult.success) {
@@ -169,8 +201,12 @@ export class AgreementController {
    * Locked agreements cannot be edited or mutated.
    */
   public static lockAgreement(req: Request, res: Response): void {
-    const { tournamentId, version } = req.params;
-    const versionNum = parseInt(version, 10);
+    const paramResult = AgreementParamsSchema.safeParse(req.params);
+    if (!paramResult.success) {
+      res.status(400).json({ success: false, errors: paramResult.error.errors });
+      return;
+    }
+    const { tournamentId, version: versionNum } = paramResult.data;
 
     const parseResult = LockAgreementSchema.safeParse(req.body);
     if (!parseResult.success) {
