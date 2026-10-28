@@ -146,6 +146,8 @@ export interface ResultAttestation {
   verifierIdentity: string;
   timestamp: number;
   attestationDigest: string;
+  signature?: string;
+  signerPublicKey?: string;
 }
 
 // ----------------------------------------------------------------------
