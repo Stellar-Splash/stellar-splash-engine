@@ -164,4 +164,20 @@ describe('Deterministic Replay & Verification Engine', () => {
     expect(verification.status).toBe('REJECTED');
     expect(verification.rejectionReason).toContain('GEOMETRIC_OUT_OF_BOUNDS');
   });
+
+  it('records structured anti-cheat fraud detection logs when violations occur', () => {
+    const invalidVersionSession: MatchSession = {
+      ...session,
+      matchId: 'match-fraud-test',
+      gameVersion: '0.0.1-hacked',
+    };
+
+    ReplayService.verifyMatch(invalidVersionSession, validResult, validEvents);
+
+    const fraudLogs = ReplayService.getFraudAuditLogs({ tournamentId: session.tournamentId });
+    expect(fraudLogs.length).toBeGreaterThan(0);
+    const lastFraud = fraudLogs[fraudLogs.length - 1];
+    expect(lastFraud.eventType).toBe('ANTI_CHEAT_FRAUD_FLAG');
+    expect((lastFraud.details as any).reasonCode).toBe('UNSUPPORTED_GAME_VERSION');
+  });
 });
