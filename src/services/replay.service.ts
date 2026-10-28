@@ -88,11 +88,75 @@ export class ReplayService {
       lastTimestamp = evt.timestamp;
     }
 
-    // 3. Independently replay event stream
+    // 3. Physical human click velocity checker (Autoclicker / macro detection)
+    const hitEvents = events.filter((e) => e.type === 'TARGET_HIT' || e.type === 'TARGET_MISSED');
+    for (let i = 1; i < hitEvents.length; i++) {
+      const deltaMs = hitEvents[i].timestamp - hitEvents[i - 1].timestamp;
+      // Inhuman click interval: < 35ms implies > 28 CPS
+      if (deltaMs < 35 && deltaMs >= 0) {
+        return {
+          verificationId,
+          matchId: session.matchId,
+          tournamentId: session.tournamentId,
+          playerWallet: session.playerWallet,
+          gameVersion: session.gameVersion,
+          submittedScore: submittedResult.finalScore,
+          replayedScore: 0,
+          scoreMatch: false,
+          resultHash: submittedResult.resultHash,
+          verificationAlgorithm: 'DETERMINISTIC_REPLAY_ENGINE',
+          verificationVersion: this.VERIFICATION_VERSION,
+          verifier: this.VERIFIER_IDENTITY,
+          verifiedAt: Date.now(),
+          status: 'REJECTED',
+          rejectionReason: `INHUMAN_CLICK_VELOCITY: Event intervals of ${deltaMs}ms detected exceeding maximum human physical response threshold (35ms / 28 CPS).`,
+        };
+      }
+    }
+
+    // 4. Target coordinate geometry and hit-radius verification
+    for (const evt of hitEvents) {
+      if (evt.type === 'TARGET_HIT' && evt.data) {
+        const { clickX, clickY, targetX, targetY, targetRadius } = evt.data as any;
+        if (
+          typeof clickX === 'number' &&
+          typeof clickY === 'number' &&
+          typeof targetX === 'number' &&
+          typeof targetY === 'number' &&
+          typeof targetRadius === 'number'
+        ) {
+          const dx = clickX - targetX;
+          const dy = clickY - targetY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          // 10px leeway for boundary and hitbox interpolation
+          if (distance > targetRadius + 10) {
+            return {
+              verificationId,
+              matchId: session.matchId,
+              tournamentId: session.tournamentId,
+              playerWallet: session.playerWallet,
+              gameVersion: session.gameVersion,
+              submittedScore: submittedResult.finalScore,
+              replayedScore: 0,
+              scoreMatch: false,
+              resultHash: submittedResult.resultHash,
+              verificationAlgorithm: 'DETERMINISTIC_REPLAY_ENGINE',
+              verificationVersion: this.VERIFICATION_VERSION,
+              verifier: this.VERIFIER_IDENTITY,
+              verifiedAt: Date.now(),
+              status: 'REJECTED',
+              rejectionReason: `GEOMETRIC_OUT_OF_BOUNDS: Target hit registered at distance ${distance.toFixed(1)}px outside target bounding radius (${targetRadius}px + 10px tolerance).`,
+            };
+          }
+        }
+      }
+    }
+
+    // 5. Independently replay event stream
     const breakdown = ScoringService.calculateScore(events);
     const replayedScore = breakdown.finalScore;
 
-    // 4. Compare replayed score vs submitted score
+    // 6. Compare replayed score vs submitted score
     const scoreMatch = replayedScore === submittedResult.finalScore;
 
     // 5. Canonicalize and check result hash

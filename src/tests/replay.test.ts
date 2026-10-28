@@ -128,4 +128,40 @@ describe('Deterministic Replay & Verification Engine', () => {
     expect(normA).toBe(normB);
     expect(CanonicalService.sha256Hex(normA)).toBe(CanonicalService.sha256Hex(normB));
   });
+
+  it('detects and rejects inhuman click velocity (autoclicker / macro bots)', () => {
+    const macroEvents: GameEvent[] = [
+      { seq: 1, timestamp: 1005000, type: 'TARGET_HIT', points: 100, combo: 1, multiplier: 1 },
+      // 10ms interval = 100 clicks/sec -> bot signature!
+      { seq: 2, timestamp: 1005010, type: 'TARGET_HIT', points: 100, combo: 2, multiplier: 1 },
+    ];
+
+    const verification = ReplayService.verifyMatch(session, { ...validResult, finalScore: 200 }, macroEvents);
+    expect(verification.status).toBe('REJECTED');
+    expect(verification.rejectionReason).toContain('INHUMAN_CLICK_VELOCITY');
+  });
+
+  it('detects and rejects out-of-bounds target hit coordinates', () => {
+    const outOfBoundsEvents: GameEvent[] = [
+      {
+        seq: 1,
+        timestamp: 1005000,
+        type: 'TARGET_HIT',
+        points: 100,
+        combo: 1,
+        multiplier: 1,
+        data: {
+          clickX: 100,
+          clickY: 100,
+          targetX: 500, // 400px away!
+          targetY: 500,
+          targetRadius: 40,
+        },
+      },
+    ];
+
+    const verification = ReplayService.verifyMatch(session, { ...validResult, finalScore: 100 }, outOfBoundsEvents);
+    expect(verification.status).toBe('REJECTED');
+    expect(verification.rejectionReason).toContain('GEOMETRIC_OUT_OF_BOUNDS');
+  });
 });
