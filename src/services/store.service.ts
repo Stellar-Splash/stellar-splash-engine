@@ -592,6 +592,25 @@ export class StoreService {
   }
 
   /**
+   * Resets all in-memory store collections.
+   */
+  public static reset(): void {
+    this.tournaments.clear();
+    this.participants.clear();
+    this.matches.clear();
+    this.results.clear();
+    this.verifications.clear();
+    this.rankings.clear();
+    this.agreements.clear();
+    this.settlements.clear();
+    this.settlementTransactions.clear();
+    this.settlementReconciliations.clear();
+    this.fundings.clear();
+    this.consumedTxs.clear();
+    this.auditLogs = [];
+  }
+
+  /**
    * Exports full storage state into a serializable snapshot object.
    */
   public static exportAll(): Record<string, any> {

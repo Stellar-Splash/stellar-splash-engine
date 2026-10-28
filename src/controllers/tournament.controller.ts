@@ -19,12 +19,36 @@ const CreateTournamentSchema = z.object({
 });
 
 export class TournamentController {
-  public static listTournaments(_req: Request, res: Response): void {
-    const list = StoreService.getAllTournaments();
+  public static listTournaments(req: Request, res: Response): void {
+    let list = [...StoreService.getAllTournaments()];
+
+    // Optional status filtering
+    const status = req.query.status as string | undefined;
+    if (status) {
+      list = list.filter((t) => t.state === status.toUpperCase());
+    }
+
+    // Sorting (default newest first)
+    const sort = (req.query.sort as string)?.toLowerCase() === 'asc' ? 'asc' : 'desc';
+    list.sort((a, b) => (sort === 'asc' ? a.createdAt - b.createdAt : b.createdAt - a.createdAt));
+
+    const total = list.length;
+
+    // Pagination
+    const page = Math.max(1, parseInt(req.query.page as string, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string, 10) || 20));
+    const totalPages = Math.ceil(total / limit) || 1;
+    const startIndex = (page - 1) * limit;
+    const paginated = list.slice(startIndex, startIndex + limit);
+
     res.json({
       success: true,
-      count: list.length,
-      tournaments: list,
+      count: paginated.length,
+      total,
+      page,
+      limit,
+      totalPages,
+      tournaments: paginated,
     });
   }
 
