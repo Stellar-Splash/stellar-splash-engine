@@ -125,11 +125,14 @@ export class ReplayService {
           typeof targetY === 'number' &&
           typeof targetRadius === 'number'
         ) {
-          const dx = clickX - targetX;
-          const dy = clickY - targetY;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          // 10px leeway for boundary and hitbox interpolation
-          if (distance > targetRadius + 10) {
+          const { valid, distance } = this.verifyHitGeometry(
+            clickX,
+            clickY,
+            targetX,
+            targetY,
+            targetRadius
+          );
+          if (!valid) {
             return {
               verificationId,
               matchId: session.matchId,
@@ -200,6 +203,26 @@ export class ReplayService {
       verifier: this.VERIFIER_IDENTITY,
       verifiedAt: Date.now(),
       status: 'VERIFIED',
+    };
+  }
+
+  /**
+   * Validates geometric Euclidean distance between player click and target centroid.
+   */
+  public static verifyHitGeometry(
+    clickX: number,
+    clickY: number,
+    targetX: number,
+    targetY: number,
+    radius: number,
+    tolerance = 10
+  ): { valid: boolean; distance: number } {
+    const dx = clickX - targetX;
+    const dy = clickY - targetY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    return {
+      valid: distance <= radius + tolerance,
+      distance,
     };
   }
 }
