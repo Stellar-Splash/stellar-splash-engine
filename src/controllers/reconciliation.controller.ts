@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { StoreService } from '../services/store.service';
+import { AccountSynchronizerService } from '../services/account-synchronizer.service';
 
 export class ReconciliationController {
   public static getReconciliation(req: Request, res: Response): void {
@@ -20,6 +21,16 @@ export class ReconciliationController {
       success: true,
       count: records.length,
       records,
+    });
+  }
+
+  public static async getVaultSolvency(req: Request, res: Response): Promise<void> {
+    const vaultAddress = (req.query.vault as string) || undefined;
+    const summary = await AccountSynchronizerService.reconcileVaultObligations(vaultAddress);
+
+    res.json({
+      success: true,
+      summary,
     });
   }
 }

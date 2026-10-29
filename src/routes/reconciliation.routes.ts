@@ -4,6 +4,7 @@ import { ReconciliationController } from '../controllers/reconciliation.controll
 const router = Router();
 
 router.get('/', ReconciliationController.getAllReconciliations);
+router.get('/vault/solvency', ReconciliationController.getVaultSolvency);
 router.get('/:tournamentId', ReconciliationController.getReconciliation);
 
 export default router;
