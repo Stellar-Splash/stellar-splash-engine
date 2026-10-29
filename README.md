@@ -169,3 +169,20 @@ npm run build
 npm start
 ```
 By default, the server listens on `http://localhost:4000`.
+
+
+---
+
+## 🛠️ Engine Architecture, Operations & Judge Evaluation Tools
+
+| Component / Guide | Description & Link |
+| :--- | :--- |
+| **Replay Verification Specification** | [docs/REPLAY_VERIFICATION_SPEC.md](docs/REPLAY_VERIFICATION_SPEC.md) - 60Hz physics, entropy checks |
+| **Channel Account Architecture** | [docs/CHANNEL_ACCOUNTS_ARCHITECTURE.md](docs/CHANNEL_ACCOUNTS_ARCHITECTURE.md) - Parallel transaction execution |
+| **Disaster Recovery & RPC Failover** | [docs/DISASTER_RECOVERY_RPC.md](docs/DISASTER_RECOVERY_RPC.md) - Circuit breaking & retry queues |
+| **Postman API Collection (v2.1)** | [docs/StellarSplash_Engine.postman_collection.json](docs/StellarSplash_Engine.postman_collection.json) |
+| **Generate Postman Collection** | `node scripts/generate-postman-collection.cjs` |
+| **Verify Full Engine Pipeline** | `npm run verify:pipeline` |
+| **Synthetic Load Test Runner** | `node scripts/load-test-synthetic.cjs` |
+| **Memory Benchmark Profiler** | `node scripts/benchmark-memory.cjs` |
+| **Docker Compose Orchestration** | `docker compose up --build` (Includes Prometheus on port `9090`) |
