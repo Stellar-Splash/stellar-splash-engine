@@ -6,24 +6,44 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
-  build-and-test:
-    name: Lint, Test, and Build Engine
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
-      - name: Use Node.js 20.x
+jobs:
+  test-and-build:
+    name: Test & Build (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Test Suite
+      - name: Verify TypeScript Types
+        run: npm run typecheck
+
+      - name: Execute Vitest Test Suite
         run: npm test
 
-      - name: Compile TypeScript
+      - name: Compile Backend Distribution
         run: npm run build
+
+      - name: Upload Build Artifacts
+        if: matrix.node-version == '20.x' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-dist
+          path: dist/
+          retention-days: 7
