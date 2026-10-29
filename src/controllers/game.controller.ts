@@ -214,8 +214,9 @@ export class GameController {
     }
 
     const verification = StoreService.getVerification(id);
+    const exportedAt = Date.now();
 
-    res.json({
+    const payload = {
       success: true,
       matchId: id,
       tournamentId: session?.tournamentId || result?.tournamentId,
@@ -229,7 +230,19 @@ export class GameController {
       events: session?.events || [],
       eventsCount: session?.events?.length || result?.eventsCount || 0,
       verification: verification || null,
-      exportedAt: Date.now(),
+      exportedAt,
+    };
+
+    const archiveDigest = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+
+    res.setHeader('X-Audit-Match-Id', id);
+    res.setHeader('X-Audit-Result-Hash', result?.resultHash || 'NONE');
+    res.setHeader('X-Audit-Archive-Digest', archiveDigest);
+    res.setHeader('X-Audit-Exported-At', String(exportedAt));
+
+    res.json({
+      ...payload,
+      archiveDigest,
     });
   }
 }
