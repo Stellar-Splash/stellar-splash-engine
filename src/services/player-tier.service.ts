@@ -1,18 +1,10 @@
-export type PlayerTier = 'BRONZE' | 'SILVER' | 'GOLD' | 'PLATINUM' | 'DIAMOND';
+import {
+  PlayerTier,
+  PlayerCareerStatsInput,
+  PlayerTierEvaluation,
+} from '../types/player-tier';
 
-export interface PlayerCareerStatsInput {
-  tournamentsJoined: number;
-  tournamentsWon: number;
-  totalScore: number;
-}
-
-export interface PlayerTierEvaluation {
-  tier: PlayerTier;
-  tierPoints: number;
-  winRatePct: number;
-  nextTier: PlayerTier | null;
-  progressToNextPct: number;
-}
+export { PlayerTier, PlayerCareerStatsInput, PlayerTierEvaluation };
 
 /**
  * Service evaluating player competitive tiers based on career tournament accomplishments.
