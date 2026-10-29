@@ -1,0 +1,121 @@
+{
+  "info": {
+    "name": "Stellar Splash Engine API",
+    "description": "Automated test suite and endpoint collection for the Stellar Splash deterministic game engine and settlement daemon.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Prometheus Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/metrics",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "metrics"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments & Verification",
+      "item": [
+        {
+          "name": "List Tournaments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/tournaments",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tournaments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Match Replay",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournamentId\": 101,\n  \"player\": \"GCQ3OLBMJUGWN3PHYE3SDIKKIPVLJSFFWG4Q4CEABGHWGBEBPBKMY6OW\",\n  \"ticks\": 3600,\n  \"score\": 4500,\n  \"inputLog\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/replay/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "replay",
+                "verify"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Live Events (SSE)",
+      "item": [
+        {
+          "name": "Leaderboard Stream",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/event-stream"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/events/leaderboard/101",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events",
+                "leaderboard",
+                "101"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
