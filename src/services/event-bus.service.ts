@@ -32,6 +32,7 @@ export interface PlatformEventPayload {
 export class EventBusService {
   private static subscribers: Set<Response> = new Set();
   private static heartbeatTimer: NodeJS.Timeout | null = null;
+  private static totalEventsDispatched: number = 0;
 
   /**
    * Registers a new SSE client connection and ensures the heartbeat loop is active.
@@ -63,6 +64,38 @@ export class EventBusService {
   }
 
   /**
+   * Returns telemetry metrics for observability and monitoring endpoints.
+   */
+  public static getTelemetry(): {
+    activeSubscribers: number;
+    totalEventsDispatched: number;
+    heartbeatActive: boolean;
+  } {
+    return {
+      activeSubscribers: this.subscribers.size,
+      totalEventsDispatched: this.totalEventsDispatched,
+      heartbeatActive: this.heartbeatTimer !== null,
+    };
+  }
+
+  /**
+   * Prunes disconnected or ended client responses from the subscriber pool.
+   */
+  public static pruneStaleConnections(): number {
+    let pruned = 0;
+    for (const client of this.subscribers) {
+      if (client.writableEnded || client.destroyed) {
+        this.subscribers.delete(client);
+        pruned++;
+      }
+    }
+    if (this.subscribers.size === 0 && this.heartbeatTimer) {
+      this.stopHeartbeat();
+    }
+    return pruned;
+  }
+
+  /**
    * Starts periodic SSE heartbeat keepalive ping to prevent proxy/load-balancer timeouts.
    */
   public static startHeartbeat(intervalMs = 15000): void {
@@ -71,6 +104,7 @@ export class EventBusService {
     }
 
     this.heartbeatTimer = setInterval(() => {
+      this.pruneStaleConnections();
       const ping = `: ping - ${Date.now()}\n\n`;
       for (const client of this.subscribers) {
         try {
@@ -101,6 +135,7 @@ export class EventBusService {
    * Broadcasts a typed platform event to all active SSE subscribers.
    */
   public static broadcast(type: PlatformEventType, data: Record<string, unknown>): void {
+    this.totalEventsDispatched++;
     const payload: PlatformEventPayload = {
       type,
       timestamp: Date.now(),
@@ -110,6 +145,35 @@ export class EventBusService {
     const message = `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`;
 
     for (const client of this.subscribers) {
+      try {
+        client.write(message);
+      } catch {
+        this.subscribers.delete(client);
+      }
+    }
+  }
+
+  /**
+   * Broadcasts a typed platform event to subscribers matching an optional filter predicate.
+   */
+  public static broadcastToFiltered(
+    type: PlatformEventType,
+    data: Record<string, unknown>,
+    filterPredicate?: (res: Response) => boolean,
+  ): void {
+    this.totalEventsDispatched++;
+    const payload: PlatformEventPayload = {
+      type,
+      timestamp: Date.now(),
+      data,
+    };
+
+    const message = `event: ${type}\ndata: ${JSON.stringify(payload)}\n\n`;
+
+    for (const client of this.subscribers) {
+      if (filterPredicate && !filterPredicate(client)) {
+        continue;
+      }
       try {
         client.write(message);
       } catch {
