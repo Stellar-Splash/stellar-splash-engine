@@ -12,3 +12,4 @@ export interface PreflightSimulationResult {
   error?: string;
   simulatedAt: number;
 }
+

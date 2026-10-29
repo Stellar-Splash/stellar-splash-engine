@@ -86,6 +86,10 @@ export class ChannelAccountManagerService {
     return this.submissionQueue.get(id);
   }
 
+  public getQueueItems(): SubmissionQueueItem[] {
+    return Array.from(this.submissionQueue.values());
+  }
+
   public getChannels(): ChannelAccount[] {
     return Array.from(this.channels.values());
   }
@@ -112,3 +116,4 @@ export class ChannelAccountManagerService {
 }
 
 export const channelAccountManager = new ChannelAccountManagerService();
+

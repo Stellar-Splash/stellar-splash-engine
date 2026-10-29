@@ -8,3 +8,4 @@ router.get('/balance/:address', WalletController.getBalances);
 router.get('/status/:hash', WalletController.getTransactionStatus);
 
 export default router;
+

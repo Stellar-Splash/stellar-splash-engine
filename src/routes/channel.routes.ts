@@ -8,3 +8,4 @@ router.get('/queue', ChannelAccountController.getQueue);
 router.post('/register', ChannelAccountController.registerChannel);
 
 export default router;
+
