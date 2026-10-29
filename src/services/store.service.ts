@@ -460,10 +460,15 @@ export class StoreService {
   }
 
   // --- Audit ---
-  public static logAudit(eventType: string, actor: string, details: Record<string, unknown>): void {
+  public static logAudit(
+    eventType: string,
+    actor: string,
+    details: Record<string, unknown>,
+    timestamp: number = Date.now()
+  ): void {
     this.auditLogs.push({
-      id: `audit-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-      timestamp: Date.now(),
+      id: `audit-${timestamp}-${Math.floor(Math.random() * 10000)}`,
+      timestamp,
       eventType,
       actor,
       details,
