@@ -7,5 +7,7 @@ coverage
 .env
 *.log
 npm-debug.log*
+data
+tests
 .DS_Store
 Thumbs.db
