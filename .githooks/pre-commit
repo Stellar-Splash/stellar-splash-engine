@@ -1,0 +1,24 @@
+#!/bin/sh
+# Stellar Splash Engine Pre-Commit Hook
+# Validates TypeScript types, formatting, and unit tests before allowing commits
+
+echo "🔍 [Pre-Commit] Running TypeScript typecheck..."
+npm run typecheck || {
+  echo "❌ [Pre-Commit] Typecheck failed. Please fix compilation errors before committing."
+  exit 1
+}
+
+echo "🎨 [Pre-Commit] Checking code formatting with Prettier..."
+npm run format:check || {
+  echo "❌ [Pre-Commit] Prettier formatting check failed. Run 'npm run format' to fix."
+  exit 1
+}
+
+echo "🧪 [Pre-Commit] Running Vitest test suite..."
+npm test || {
+  echo "❌ [Pre-Commit] Test suite failed. Fix failing tests before committing."
+  exit 1
+}
+
+echo "✅ [Pre-Commit] All quality checks passed!"
+exit 0
