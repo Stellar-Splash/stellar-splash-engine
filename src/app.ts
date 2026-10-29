@@ -13,6 +13,10 @@ import walletRoutes from './routes/wallet.routes';
 import simulationRoutes from './routes/simulation.routes';
 import channelRoutes from './routes/channel.routes';
 import contractEventsRoutes from './routes/contract-events.routes';
+import antiCheatRoutes from './routes/anti-cheat.routes';
+import settlementDaemonRoutes from './routes/settlement-daemon.routes';
+import forensicRoutes from './routes/forensic.routes';
+import leaderboardStreamRoutes from './routes/leaderboard-stream.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 import { createRateLimiter, SlidingWindowRateLimiter } from './middleware/rate-limiter.middleware';
 import { requestIdMiddleware } from './middleware/request-id.middleware';
@@ -98,6 +102,10 @@ export const createApp = (): Express => {
   app.use('/api/transactions', simulationRoutes);
   app.use('/api/channels', channelRoutes);
   app.use('/api/events/contracts', contractEventsRoutes);
+  app.use('/api/anti-cheat', antiCheatRoutes);
+  app.use('/api/daemon/settlement', settlementDaemonRoutes);
+  app.use('/api/forensics', forensicRoutes);
+  app.use('/api/leaderboard/live', leaderboardStreamRoutes);
 
   // 404 Catch-All Handler
   app.use(notFoundHandler);
