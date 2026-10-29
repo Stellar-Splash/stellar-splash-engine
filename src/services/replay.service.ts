@@ -1,7 +1,9 @@
+import crypto from 'crypto';
 import { GameEvent, GameResult, MatchSession, ResultVerification, AuditEvent } from '../types';
 import { ScoringService } from './scoring.service';
 import { CanonicalService } from './canonical.service';
 import { StoreService } from './store.service';
+import { PrngService } from './prng.service';
 import { CONFIG } from '../config';
 
 export class ReplayService {
@@ -46,6 +48,54 @@ export class ReplayService {
       if (filter.playerWallet && l.actor !== filter.playerWallet) return false;
       return true;
     });
+  }
+
+  /**
+   * Generates the canonical deterministic match seed binding tournament, match session, and player wallet.
+   */
+  public static deriveCanonicalSeed(
+    tournamentId: string,
+    matchId: string,
+    playerWallet: string
+  ): string {
+    return crypto
+      .createHash('sha256')
+      .update(`${tournamentId}:${matchId}:${playerWallet}`)
+      .digest('hex');
+  }
+
+  /**
+   * Verifies that a claimed match seed conforms to deterministic derivation.
+   * Prevents pre-computation or seed substitution attacks.
+   */
+  public static verifyMatchSeed(
+    tournamentId: string,
+    matchId: string,
+    playerWallet: string,
+    claimedSeed: string
+  ): {
+    valid: boolean;
+    canonicalSeed: string;
+    numericSeed: number;
+    error?: string;
+  } {
+    const canonicalSeed = this.deriveCanonicalSeed(tournamentId, matchId, playerWallet);
+    const numericSeed = PrngService.hashStringToSeed(canonicalSeed);
+
+    if (claimedSeed !== canonicalSeed) {
+      return {
+        valid: false,
+        canonicalSeed,
+        numericSeed,
+        error: `SEED_MISMATCH: Claimed seed does not match deterministic derivation for match ${matchId}.`,
+      };
+    }
+
+    return {
+      valid: true,
+      canonicalSeed,
+      numericSeed,
+    };
   }
 
   /**
