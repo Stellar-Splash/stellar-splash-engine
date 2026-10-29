@@ -9,6 +9,10 @@ import verificationRoutes from './routes/verification.routes';
 import rankingRoutes from './routes/ranking.routes';
 import agreementRoutes from './routes/agreement.routes';
 import settlementRoutes from './routes/settlement.routes';
+import walletRoutes from './routes/wallet.routes';
+import simulationRoutes from './routes/simulation.routes';
+import channelRoutes from './routes/channel.routes';
+import contractEventsRoutes from './routes/contract-events.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 import { createRateLimiter, SlidingWindowRateLimiter } from './middleware/rate-limiter.middleware';
 import { requestIdMiddleware } from './middleware/request-id.middleware';
@@ -90,6 +94,10 @@ export const createApp = (): Express => {
   app.use('/api/rankings', rankingRoutes);
   app.use('/api/agreements', agreementRoutes);
   app.use('/api/settlements', settlementRoutes);
+  app.use('/api/wallet', walletRoutes);
+  app.use('/api/transactions', simulationRoutes);
+  app.use('/api/channels', channelRoutes);
+  app.use('/api/events/contracts', contractEventsRoutes);
 
   // 404 Catch-All Handler
   app.use(notFoundHandler);
