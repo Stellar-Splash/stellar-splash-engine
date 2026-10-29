@@ -10,10 +10,12 @@ import rankingRoutes from './routes/ranking.routes';
 import agreementRoutes from './routes/agreement.routes';
 import settlementRoutes from './routes/settlement.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
-import { createRateLimiter } from './middleware/rate-limiter.middleware';
+import { createRateLimiter, SlidingWindowRateLimiter } from './middleware/rate-limiter.middleware';
 import { requestIdMiddleware } from './middleware/request-id.middleware';
 import { MetricsService } from './services/metrics.service';
 import { CONFIG } from './config';
+
+export const globalRateLimiter = new SlidingWindowRateLimiter({ windowMs: 60_000, maxRequests: 200 });
 
 export const createApp = (): Express => {
   const app = express();
@@ -21,7 +23,7 @@ export const createApp = (): Express => {
   app.use(requestIdMiddleware);
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
-  app.use(createRateLimiter({ windowMs: 60_000, maxRequests: 200 }));
+  app.use(globalRateLimiter.middleware());
 
   // Prometheus Metrics Tracking Middleware
   app.use((req: Request, res: Response, next: NextFunction) => {
@@ -29,6 +31,18 @@ export const createApp = (): Express => {
       MetricsService.recordHttpRequest(req.method, req.path, res.statusCode);
     });
     next();
+  });
+
+  // Rate Limiting Status Query Endpoint
+  app.get('/api/rate-limit/status', (req: Request, res: Response) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : req.ip || '127.0.0.1';
+    const status = globalRateLimiter.getStatus(ip);
+    res.json({
+      success: true,
+      ip,
+      ...status,
+    });
   });
 
   // Prometheus Metrics Exposition Endpoint

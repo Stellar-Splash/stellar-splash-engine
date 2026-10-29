@@ -94,6 +94,9 @@ export class SlidingWindowRateLimiter {
       res.setHeader('RateLimit-Limit', this.maxRequests.toString());
       res.setHeader('RateLimit-Remaining', Math.max(0, remaining - 1).toString());
       res.setHeader('RateLimit-Reset', resetTime.toString());
+      res.setHeader('X-RateLimit-Limit', this.maxRequests.toString());
+      res.setHeader('X-RateLimit-Remaining', Math.max(0, remaining - 1).toString());
+      res.setHeader('X-RateLimit-Reset', resetTime.toString());
 
       if (currentCount >= this.maxRequests) {
         res.setHeader('Retry-After', resetTime.toString());
@@ -109,6 +112,23 @@ export class SlidingWindowRateLimiter {
 
       entry.timestamps.push(now);
       next();
+    };
+  }
+
+  public getStatus(key: string): { limit: number; remaining: number; reset: number } {
+    const now = Date.now();
+    const cutoff = now - this.windowMs;
+    const entry = this.hits.get(key);
+    const active = entry ? entry.timestamps.filter((ts) => ts > cutoff) : [];
+    const remaining = Math.max(0, this.maxRequests - active.length);
+    const reset =
+      active.length > 0
+        ? Math.ceil((active[0] + this.windowMs - now) / 1000)
+        : Math.ceil(this.windowMs / 1000);
+    return {
+      limit: this.maxRequests,
+      remaining,
+      reset,
     };
   }
 }

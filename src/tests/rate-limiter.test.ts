@@ -96,4 +96,21 @@ describe('SlidingWindowRateLimiter Middleware', () => {
     expect(getStatusCode()).toBe(200);
     expect(nextMock).toHaveBeenCalledTimes(4);
   });
+
+  it('exposes getStatus and sets X-RateLimit headers', () => {
+    const middleware = limiter.middleware();
+    const nextMock = vi.fn();
+
+    const { req, res, headers } = createMockReqRes('192.168.1.50');
+    middleware(req, res, nextMock);
+
+    expect(headers['X-RateLimit-Limit']).toBe('3');
+    expect(headers['X-RateLimit-Remaining']).toBe('2');
+    expect(headers['X-RateLimit-Reset']).toBeDefined();
+
+    const status = limiter.getStatus('192.168.1.50');
+    expect(status.limit).toBe(3);
+    expect(status.remaining).toBe(2);
+    expect(status.reset).toBeGreaterThan(0);
+  });
 });
