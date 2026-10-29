@@ -1,0 +1,33 @@
+name: Docker Container Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker:
+    name: Build & Validate Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: stellar-splash/engine:test
+          load: true
+
+      - name: Run Container Healthcheck Test
+        run: |
+          docker run -d --name test-engine -p 3000:3000 stellar-splash/engine:test
+          sleep 5
+          docker ps
+          docker stop test-engine
