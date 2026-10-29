@@ -22,8 +22,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3001
 
-# Add curl for container health check
-RUN apk add --no-cache curl
+# Add curl & dumb-init for container health check and PID 1 signal handling
+RUN apk add --no-cache curl dumb-init
 
 # Install production dependencies only
 COPY package.json package-lock.json ./
@@ -43,4 +43,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3001/api/health || exit 1
 
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["node", "dist/index.js"]
