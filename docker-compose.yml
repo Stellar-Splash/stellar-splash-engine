@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: stellar-splash-engine
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - STELLAR_NETWORK=TESTNET
+      - SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
+      - HORIZON_URL=https://horizon-testnet.stellar.org
+      - CONTRACT_ID=CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - splash-network
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: stellar-splash-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - splash-network
+    depends_on:
+      - engine
+
+networks:
+  splash-network:
+    driver: bridge
