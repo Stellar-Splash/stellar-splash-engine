@@ -1,0 +1,25 @@
+name: Nightly Load Testing
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Daily at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  load-test:
+    name: Execute Synthetic Load Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run Synthetic Load Test
+        run: node scripts/load-test-synthetic.cjs
+
+      - name: Run Memory Heap Benchmark
+        run: node scripts/benchmark-memory.cjs
