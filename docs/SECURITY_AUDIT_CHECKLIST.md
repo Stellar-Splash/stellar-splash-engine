@@ -17,3 +17,4 @@
 - [x] Strict CORS policy restricting frontend origin requests.
 - [x] In-memory rate limiting preventing API denial of service.
 - [x] Prometheus metrics scraping isolated to private internal VPC network.
+

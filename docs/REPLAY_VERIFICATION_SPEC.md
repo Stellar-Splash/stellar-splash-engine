@@ -29,3 +29,4 @@ The Stellar Splash Engine operates a headless, deterministic simulation kernel t
 ### 3.3 Collision Invariant Proof
 - Obstacle hitboxes are verified at every tick.
 - If a replay claims a survival state when collision coordinates intersect obstacle geometry, the run is flagged as `ERR_GHOST_COLLISION`.
+

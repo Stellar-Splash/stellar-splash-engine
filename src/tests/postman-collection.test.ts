@@ -22,3 +22,4 @@ describe('Postman Collection Verification', () => {
     expect(groupNames).toContain('Live Events (SSE)');
   });
 });
+

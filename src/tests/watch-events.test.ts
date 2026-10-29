@@ -20,3 +20,4 @@ describe('Contract Event Watcher Filter', () => {
     expect(WATCH_CONFIG.contractId).toBe('CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ');
   });
 });
+

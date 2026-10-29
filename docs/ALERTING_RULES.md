@@ -31,3 +31,4 @@ groups:
           summary: "Abnormal surge in rejected replay submissions"
           description: "High rate of anti-cheat entropy or velocity violations detected."
 ```
+

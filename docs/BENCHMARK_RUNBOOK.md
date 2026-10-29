@@ -33,3 +33,4 @@ Key metrics tracked:
 - `stellar_splash_rejected_replays_total`: Total fraudulent matches caught.
 - `stellar_splash_active_channels_gauge`: Number of available channel accounts.
 - `stellar_splash_settlement_duration_seconds`: Histogram of on-chain commit latency.
+

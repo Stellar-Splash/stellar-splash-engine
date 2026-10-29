@@ -32,3 +32,4 @@ The engine configures a prioritized cluster of Soroban RPC endpoints:
 - **Exponential Backoff**: Transient errors retry at intervals of $100\text{ ms} \times 2^n$ up to 5 attempts.
 - **Circuit Half-Open State**: After a 30-second cooldown period, probe requests are issued to verify primary endpoint health before routing production traffic back.
 - **In-Memory Dead-Letter Queue (DLQ)**: Transactions that cannot be dispatched due to persistent network partition are serialized to disk (`var/dlq.json`) and retried automatically once connectivity restores.
+

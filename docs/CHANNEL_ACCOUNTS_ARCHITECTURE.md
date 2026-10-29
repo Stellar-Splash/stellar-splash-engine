@@ -29,3 +29,4 @@ Stellar Splash utilizes a pool of **Channel Accounts** (ephemeral sub-accounts f
 2. **Fee Sponsorship**: Channel accounts are sponsored by the root treasury, ensuring zero user gas overhead during settlement callbacks.
 3. **Automatic Sequence Resync**: In case of network forks or dropped transactions, the engine polls Horizon/RPC to refresh the true ledger sequence.
 4. **Health & Balance Monitoring**: Channels with balances below 5 XLM are automatically topped up via Friendbot (on testnet) or treasury disbursement.
+

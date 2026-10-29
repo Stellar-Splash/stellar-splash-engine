@@ -106,3 +106,4 @@ if (!fs.existsSync(outDir)) {
 const outPath = path.join(outDir, 'StellarSplash_Engine.postman_collection.json');
 fs.writeFileSync(outPath, JSON.stringify(collection, null, 2) + '\n');
 console.log('Generated Postman collection at: ' + outPath);
+
