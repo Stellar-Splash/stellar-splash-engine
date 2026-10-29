@@ -59,7 +59,7 @@ describe('TournamentExpirationWorker', () => {
     const finalized = TournamentExpirationWorker.checkExpiredTournaments(now);
     expect(finalized).toHaveLength(2);
     expect(finalized.map((t) => t.id)).toEqual(
-      expect.arrayContaining(['tourn-expired-1', 'tourn-expired-2'])
+      expect.arrayContaining(['tourn-expired-1', 'tourn-expired-2']),
     );
 
     // Verify state updated in StoreService
@@ -68,10 +68,13 @@ describe('TournamentExpirationWorker', () => {
     expect(StoreService.getTournamentById('tourn-active-future')?.state).toBe('OPEN');
 
     // Verify broadcast event was dispatched
-    expect(broadcastSpy).toHaveBeenCalledWith('TOURNAMENT_FINALIZED', expect.objectContaining({
-      tournamentId: 'tourn-expired-1',
-      reason: 'CUTOFF_TIME_ELAPSED',
-    }));
+    expect(broadcastSpy).toHaveBeenCalledWith(
+      'TOURNAMENT_FINALIZED',
+      expect.objectContaining({
+        tournamentId: 'tourn-expired-1',
+        reason: 'CUTOFF_TIME_ELAPSED',
+      }),
+    );
   });
 
   it('does not re-finalize tournaments that are already SETTLED or CANCELLED', () => {

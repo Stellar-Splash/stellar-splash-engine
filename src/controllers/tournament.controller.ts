@@ -115,7 +115,9 @@ export class TournamentController {
     const { playerWallet } = req.body;
 
     if (!playerWallet || typeof playerWallet !== 'string' || playerWallet.length !== 56) {
-      res.status(400).json({ success: false, error: 'Valid 56-character Stellar wallet address required' });
+      res
+        .status(400)
+        .json({ success: false, error: 'Valid 56-character Stellar wallet address required' });
       return;
     }
 
@@ -134,14 +136,21 @@ export class TournamentController {
       return;
     }
 
-    if (tournament.maxParticipants > 0 && tournament.currentParticipants >= tournament.maxParticipants) {
-      res.status(400).json({ success: false, error: 'Tournament has reached maximum participant capacity' });
+    if (
+      tournament.maxParticipants > 0 &&
+      tournament.currentParticipants >= tournament.maxParticipants
+    ) {
+      res
+        .status(400)
+        .json({ success: false, error: 'Tournament has reached maximum participant capacity' });
       return;
     }
 
     const existing = StoreService.getParticipant(id, playerWallet);
     if (existing) {
-      res.status(409).json({ success: false, error: 'Player is already registered in this tournament' });
+      res
+        .status(409)
+        .json({ success: false, error: 'Player is already registered in this tournament' });
       return;
     }
 

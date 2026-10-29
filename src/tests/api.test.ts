@@ -15,7 +15,9 @@ describe('Stellar Splash Engine API', () => {
     expect(res.body.memory.rssMb).toBeGreaterThan(0);
     expect(res.body.memory.heapUsedMb).toBeGreaterThan(0);
     expect(res.body.process.nodeVersion).toBeDefined();
-    expect(res.body.soroban.contractId).toBe('CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ');
+    expect(res.body.soroban.contractId).toBe(
+      'CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ',
+    );
   });
 
   it('GET /api/tournaments lists tournaments with initial seed', async () => {
@@ -68,13 +70,11 @@ describe('Stellar Splash Engine API', () => {
     const playerWallet = 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB';
 
     // 1. Start game session
-    const startRes = await request(app)
-      .post('/api/games/start')
-      .send({
-        tournamentId: 'tourn-splash-001',
-        playerWallet,
-        gameId: 'splash-rush',
-      });
+    const startRes = await request(app).post('/api/games/start').send({
+      tournamentId: 'tourn-splash-001',
+      playerWallet,
+      gameId: 'splash-rush',
+    });
 
     expect(startRes.status).toBe(201);
     const { matchId, sessionToken } = startRes.body.match;
@@ -124,28 +124,34 @@ describe('Stellar Splash Engine API', () => {
     // 5. Verify leaderboard reflects score
     const lbRes = await request(app).get('/api/tournaments/tourn-splash-001/leaderboard');
     expect(lbRes.status).toBe(200);
-    const entry = lbRes.body.leaderboard.find((e: { playerWallet: string }) => e.playerWallet === playerWallet);
+    const entry = lbRes.body.leaderboard.find(
+      (e: { playerWallet: string }) => e.playerWallet === playerWallet,
+    );
     expect(entry).toBeDefined();
     expect(entry.currentScore).toBe(completeRes.body.result.finalScore);
     expect(entry.scoreLabel).toBe('Current Score');
 
     // 6. Replay attack rejection: Another match attempting to submit duplicate event stream
     const player2 = 'GB6V2A73VUX6KAZD66N6E64B44J7K3XW6P2W3V7QOXWCV7T4KQL3ZPL2';
-    await request(app).post('/api/tournaments/tourn-splash-001/join').send({ playerWallet: player2 });
+    await request(app)
+      .post('/api/tournaments/tourn-splash-001/join')
+      .send({ playerWallet: player2 });
     const start2 = await request(app).post('/api/games/start').send({
       tournamentId: 'tourn-splash-001',
       playerWallet: player2,
     });
-    const replayAttackRes = await request(app).post('/api/games/complete').send({
-      matchId: start2.body.match.matchId,
-      sessionToken: start2.body.match.sessionToken,
-      endTime: Date.now() + 45000,
-      events: [
-        { seq: 1, timestamp: 1000, type: 'TARGET_HIT', points: 200, combo: 1, multiplier: 1 },
-        { seq: 2, timestamp: 2000, type: 'TARGET_HIT', points: 300, combo: 2, multiplier: 2 },
-        { seq: 3, timestamp: 3000, type: 'HAZARD_HIT', points: 50, combo: 0, multiplier: 1 },
-      ],
-    });
+    const replayAttackRes = await request(app)
+      .post('/api/games/complete')
+      .send({
+        matchId: start2.body.match.matchId,
+        sessionToken: start2.body.match.sessionToken,
+        endTime: Date.now() + 45000,
+        events: [
+          { seq: 1, timestamp: 1000, type: 'TARGET_HIT', points: 200, combo: 1, multiplier: 1 },
+          { seq: 2, timestamp: 2000, type: 'TARGET_HIT', points: 300, combo: 2, multiplier: 2 },
+          { seq: 3, timestamp: 3000, type: 'HAZARD_HIT', points: 50, combo: 0, multiplier: 1 },
+        ],
+      });
     expect(replayAttackRes.status).toBe(409);
     expect(replayAttackRes.body.error).toContain('REPLAY_ATTACK_DETECTED');
   });
@@ -244,4 +250,3 @@ describe('Stellar Splash Engine API', () => {
     expect(secondFinalize.status).toBe(409);
   });
 });
-

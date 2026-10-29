@@ -93,7 +93,7 @@ describe('ScoringService', () => {
       { rank: 2, basisPoints: 4999 },
     ];
     expect(() => ScoringService.calculatePrizePoolBpsShares(100_000n, invalid)).toThrow(
-      'INVALID_BPS_SUM'
+      'INVALID_BPS_SUM',
     );
   });
 });

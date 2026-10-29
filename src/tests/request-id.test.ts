@@ -17,9 +17,7 @@ describe('Request ID Tracing Middleware', () => {
 
   it('preserves client-provided X-Request-Id header for distributed request correlation', async () => {
     const customId = 'client-trace-abc-123-xyz';
-    const res = await request(app)
-      .get('/api/health')
-      .set('X-Request-Id', customId);
+    const res = await request(app).get('/api/health').set('X-Request-Id', customId);
 
     expect(res.status).toBe(200);
     expect(res.headers['x-request-id']).toBe(customId);

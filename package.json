@@ -9,7 +9,9 @@
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\""
   },
   "keywords": [
     "stellar",
@@ -36,6 +38,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^22.13.5",
     "@types/supertest": "^6.0.2",
+    "prettier": "^3.9.10",
     "supertest": "^7.0.0",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",

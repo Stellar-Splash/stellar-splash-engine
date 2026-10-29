@@ -347,9 +347,7 @@ describe('Settlement and Reconciliation Engine', () => {
     });
 
     it('POST /api/settlements/:tournamentId/execute processes payouts', async () => {
-      const res = await request(app)
-        .post(`/api/settlements/${testTournamentId}/execute`)
-        .send({});
+      const res = await request(app).post(`/api/settlements/${testTournamentId}/execute`).send({});
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.settlement.status).toBe('RECONCILED');

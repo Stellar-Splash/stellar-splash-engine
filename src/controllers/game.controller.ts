@@ -27,7 +27,7 @@ const CompleteGameSchema = z.object({
       combo: z.number().int(),
       multiplier: z.number().int(),
       data: z.record(z.unknown()).optional(),
-    })
+    }),
   ),
 });
 
@@ -118,7 +118,9 @@ export class GameController {
     }
 
     if (session.sessionToken !== sessionToken) {
-      res.status(403).json({ success: false, error: 'Invalid session token. Submission rejected.' });
+      res
+        .status(403)
+        .json({ success: false, error: 'Invalid session token. Submission rejected.' });
       return;
     }
 
@@ -141,7 +143,7 @@ export class GameController {
     // Replay attack prevention: Compute deterministic fingerprint for event stream
     if (events.length > 0) {
       const canonicalEvents = CanonicalService.canonicalSerialize(
-        CanonicalService.normalizeEvents(events as GameEvent[])
+        CanonicalService.normalizeEvents(events as GameEvent[]),
       );
       const eventFingerprint = crypto.createHash('sha256').update(canonicalEvents).digest('hex');
 
@@ -170,7 +172,11 @@ export class GameController {
     StoreService.saveGameResult(result);
 
     // Update participant record in tournament leaderboard
-    StoreService.updateParticipantScore(session.tournamentId, session.playerWallet, result.finalScore);
+    StoreService.updateParticipantScore(
+      session.tournamentId,
+      session.playerWallet,
+      result.finalScore,
+    );
 
     EventBusService.broadcast('MATCH_COMPLETED', {
       matchId: result.matchId,

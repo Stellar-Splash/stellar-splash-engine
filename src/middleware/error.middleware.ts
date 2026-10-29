@@ -31,12 +31,7 @@ export const notFoundHandler = (req: Request, res: Response): void => {
 /**
  * Standardized global JSON error handling middleware.
  */
-export const errorHandler = (
-  err: any,
-  _req: Request,
-  res: Response,
-  _next: NextFunction
-): void => {
+export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction): void => {
   // Handle JSON parse syntax errors from express.json()
   if (err instanceof SyntaxError && 'status' in err && (err as any).status === 400) {
     res.status(400).json({

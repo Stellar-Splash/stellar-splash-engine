@@ -1,7 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app';
-import { AccountSynchronizerService, VaultBalanceInfo } from '../src/services/account-synchronizer.service';
+import {
+  AccountSynchronizerService,
+  VaultBalanceInfo,
+} from '../src/services/account-synchronizer.service';
 import { StoreService } from '../src/services/store.service';
 import { Tournament } from '../src/types';
 

@@ -51,7 +51,7 @@ export class PrngService {
     durationMs: number = 45000,
     spawnIntervalMs: number = 750,
     canvasWidth: number = 790,
-    canvasHeight: number = 460
+    canvasHeight: number = 460,
   ): GeneratedTarget[] {
     const seed = this.hashStringToSeed(matchSeed);
     const prng = this.createMulberry32(seed);
@@ -72,12 +72,12 @@ export class PrngService {
         points = -50;
         radius = 24;
         lifeMs = 3200;
-      } else if (typeRoll < 0.30) {
+      } else if (typeRoll < 0.3) {
         type = 'BURST';
         points = 25;
         radius = 22;
         lifeMs = 2200;
-      } else if (typeRoll < 0.40) {
+      } else if (typeRoll < 0.4) {
         type = 'GOLDEN';
         points = 50;
         radius = 32;
@@ -116,7 +116,7 @@ export class PrngService {
     clickX: number,
     clickY: number,
     elapsedMs: number,
-    tolerancePx: number = 10
+    tolerancePx: number = 10,
   ): { valid: boolean; target?: GeneratedTarget } {
     for (const t of targets) {
       if (elapsedMs >= t.spawnTimeMs && elapsedMs <= t.expireTimeMs + 100) {

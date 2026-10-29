@@ -13,7 +13,11 @@ export class CanonicalService {
       return '[' + obj.map((x) => this.canonicalSerialize(x)).join(',') + ']';
     }
     const keys = Object.keys(obj).sort();
-    return '{' + keys.map((k) => JSON.stringify(k) + ':' + this.canonicalSerialize(obj[k])).join(',') + '}';
+    return (
+      '{' +
+      keys.map((k) => JSON.stringify(k) + ':' + this.canonicalSerialize(obj[k])).join(',') +
+      '}'
+    );
   }
 
   /**
@@ -55,7 +59,7 @@ export class CanonicalService {
       | 'maxCombo'
       | 'endTime'
     >,
-    normalizedEvents: GameEvent[]
+    normalizedEvents: GameEvent[],
   ): string {
     const canonicalObject = {
       matchId: session.matchId,
@@ -90,7 +94,12 @@ export class CanonicalService {
   /**
    * Generates a canonical SHA-256 hash for a tournament prize agreement.
    */
-  public static computeAgreementHash(agreement: Omit<PrizeAgreement, 'agreementHash' | 'status' | 'approvedBy' | 'approvedAt' | 'approvalSignature' | 'lockedAt'>): string {
+  public static computeAgreementHash(
+    agreement: Omit<
+      PrizeAgreement,
+      'agreementHash' | 'status' | 'approvedBy' | 'approvedAt' | 'approvalSignature' | 'lockedAt'
+    >,
+  ): string {
     const canonicalObject = {
       agreementId: agreement.agreementId,
       tournamentId: agreement.tournamentId,
@@ -119,7 +128,11 @@ export class CanonicalService {
   /**
    * Generates a canonical SHA-256 hash for a finalized tournament ranking.
    */
-  public static computeRankingHash(tournamentId: string, version: number, entries: RankingEntry[]): string {
+  public static computeRankingHash(
+    tournamentId: string,
+    version: number,
+    entries: RankingEntry[],
+  ): string {
     const canonicalObject = {
       tournamentId,
       rankingVersion: Math.floor(version),
@@ -175,4 +188,3 @@ export class CanonicalService {
     return crypto.createHash('sha256').update(canonicalJson).digest('hex');
   }
 }
-

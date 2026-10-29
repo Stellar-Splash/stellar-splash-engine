@@ -46,9 +46,11 @@ describe('AttestationService with Ed25519 Cryptographic Signatures', () => {
   it('rejects forged attestation signature', () => {
     const attestation = AttestationService.createAttestation(sampleVerification);
 
+    const originalSig = attestation.signature || '';
+    const corruptChar = originalSig.charAt(0) === 'a' ? 'b' : 'a';
     const forgedAttestation = {
       ...attestation,
-      signature: attestation.signature?.replace(/[a-f0-9]/, '0'), // corrupt signature
+      signature: corruptChar + originalSig.slice(1),
     };
 
     const isValid = AttestationService.verifyAttestation(forgedAttestation, sampleVerification);

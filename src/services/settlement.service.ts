@@ -1,4 +1,11 @@
-import { Keypair, Horizon, TransactionBuilder, Operation, Asset, Networks } from '@stellar/stellar-sdk';
+import {
+  Keypair,
+  Horizon,
+  TransactionBuilder,
+  Operation,
+  Asset,
+  Networks,
+} from '@stellar/stellar-sdk';
 import crypto from 'crypto';
 import { CONFIG } from '../config';
 import {
@@ -62,27 +69,37 @@ export class SettlementService {
         const expectedRankingHash = CanonicalService.computeRankingHash(
           tournamentId,
           ranking.rankingVersion,
-          ranking.entries
+          ranking.entries,
         );
         if (expectedRankingHash !== ranking.rankingHash) {
-          reasons.push('RANKING_HASH_MISMATCH: Stored ranking hash does not match canonical calculation.');
+          reasons.push(
+            'RANKING_HASH_MISMATCH: Stored ranking hash does not match canonical calculation.',
+          );
         }
 
         // Verify each result in the ranking is verified
         for (const entry of ranking.entries) {
           const gameResult = StoreService.getGameResult(entry.matchId);
           const verification = StoreService.getVerification(entry.matchId);
-          const isVerified = (gameResult && gameResult.verified) || (verification && verification.status === 'VERIFIED');
+          const isVerified =
+            (gameResult && gameResult.verified) ||
+            (verification && verification.status === 'VERIFIED');
 
           if (!isVerified) {
             reasons.push(
-              `UNVERIFIED_RESULT: Rank ${entry.rank} match ${entry.matchId} result has not been independently verified.`
+              `UNVERIFIED_RESULT: Rank ${entry.rank} match ${entry.matchId} result has not been independently verified.`,
             );
           }
 
           // Validate Stellar wallet format
-          if (!entry.playerWallet || !entry.playerWallet.startsWith('G') || entry.playerWallet.length !== 56) {
-            reasons.push(`INVALID_RECIPIENT_WALLET: Player wallet '${entry.playerWallet}' is not a valid Stellar address.`);
+          if (
+            !entry.playerWallet ||
+            !entry.playerWallet.startsWith('G') ||
+            entry.playerWallet.length !== 56
+          ) {
+            reasons.push(
+              `INVALID_RECIPIENT_WALLET: Player wallet '${entry.playerWallet}' is not a valid Stellar address.`,
+            );
           }
         }
       }
@@ -94,7 +111,9 @@ export class SettlementService {
       reasons.push('AGREEMENT_NOT_FOUND: No prize agreement configured for this tournament.');
     } else {
       if (agreement.status !== 'LOCKED') {
-        reasons.push(`AGREEMENT_NOT_LOCKED: Prize agreement v${agreement.version} status is '${agreement.status}', expected 'LOCKED'.`);
+        reasons.push(
+          `AGREEMENT_NOT_LOCKED: Prize agreement v${agreement.version} status is '${agreement.status}', expected 'LOCKED'.`,
+        );
       }
 
       // Verify canonical agreement hash
@@ -114,7 +133,9 @@ export class SettlementService {
       });
 
       if (expectedAgreementHash !== agreement.agreementHash) {
-        reasons.push('AGREEMENT_HASH_MISMATCH: Stored agreement hash does not match canonical calculation.');
+        reasons.push(
+          'AGREEMENT_HASH_MISMATCH: Stored agreement hash does not match canonical calculation.',
+        );
       }
     }
 
@@ -124,11 +145,13 @@ export class SettlementService {
       reasons.push('PRIZE_POOL_NOT_FUNDED: No on-chain prize pool funding record found.');
     } else {
       if (funding.status !== 'CONFIRMED') {
-        reasons.push('PRIZE_POOL_NOT_CONFIRMED: Prize pool funding has not been confirmed on Stellar.');
+        reasons.push(
+          'PRIZE_POOL_NOT_CONFIRMED: Prize pool funding has not been confirmed on Stellar.',
+        );
       }
       if (agreement && funding.amount < agreement.prizePoolAmount) {
         reasons.push(
-          `INSUFFICIENT_PRIZE_POOL: On-chain funded amount (${funding.amount} ${funding.asset}) is less than agreement requirement (${agreement.prizePoolAmount} ${agreement.prizeAsset}).`
+          `INSUFFICIENT_PRIZE_POOL: On-chain funded amount (${funding.amount} ${funding.asset}) is less than agreement requirement (${agreement.prizePoolAmount} ${agreement.prizeAsset}).`,
         );
       }
     }
@@ -142,13 +165,20 @@ export class SettlementService {
         existingSettlement.status === 'SUBMITTING' ||
         existingSettlement.status === 'CONFIRMING'
       ) {
-        reasons.push(`SETTLEMENT_ALREADY_EXISTS: Tournament already has an active or completed settlement (${existingSettlement.settlementId}).`);
+        reasons.push(
+          `SETTLEMENT_ALREADY_EXISTS: Tournament already has an active or completed settlement (${existingSettlement.settlementId}).`,
+        );
       }
     }
 
     // 6. Valid asset
-    if (agreement && !(CONFIG.SUPPORTED_ASSETS as readonly string[]).includes(agreement.prizeAsset)) {
-      reasons.push(`INVALID_PRIZE_ASSET: Asset '${agreement.prizeAsset}' is not supported for settlement.`);
+    if (
+      agreement &&
+      !(CONFIG.SUPPORTED_ASSETS as readonly string[]).includes(agreement.prizeAsset)
+    ) {
+      reasons.push(
+        `INVALID_PRIZE_ASSET: Asset '${agreement.prizeAsset}' is not supported for settlement.`,
+      );
     }
 
     return {
@@ -181,7 +211,7 @@ export class SettlementService {
     // Calculate deterministic payouts from basis points
     const allocations = AgreementService.calculateSettlementAllocations(
       agreement.prizePoolAmount,
-      agreement.allocationRules
+      agreement.allocationRules,
     );
 
     // Map each allocation rule to the corresponding ranked player
@@ -189,7 +219,9 @@ export class SettlementService {
     for (const alloc of allocations) {
       const entry = ranking.entries.find((e) => e.rank === alloc.rank);
       if (!entry) {
-        throw new Error(`MISSING_RANK_ENTRY: No player found in finalized ranking for Rank ${alloc.rank}.`);
+        throw new Error(
+          `MISSING_RANK_ENTRY: No player found in finalized ranking for Rank ${alloc.rank}.`,
+        );
       }
 
       recipients.push({
@@ -209,7 +241,7 @@ export class SettlementService {
 
     if (totalAllocated !== grossPrizePool) {
       throw new Error(
-        `ACCOUNTING_INVARIANT_VIOLATION: Sum of payouts (${totalAllocated}) does not equal Gross Prize Pool (${grossPrizePool}).`
+        `ACCOUNTING_INVARIANT_VIOLATION: Sum of payouts (${totalAllocated}) does not equal Gross Prize Pool (${grossPrizePool}).`,
       );
     }
 
@@ -301,7 +333,9 @@ export class SettlementService {
     }
 
     if (settlement.status === 'SETTLED' || settlement.status === 'RECONCILED') {
-      throw new Error(`SETTLEMENT_ALREADY_COMPLETED: Settlement ${settlement.settlementId} is already completed.`);
+      throw new Error(
+        `SETTLEMENT_ALREADY_COMPLETED: Settlement ${settlement.settlementId} is already completed.`,
+      );
     }
 
     // Bind authorization
@@ -342,7 +376,9 @@ export class SettlementService {
     }
 
     if (settlement.status !== 'AUTHORIZED' && settlement.status !== 'READY') {
-      throw new Error(`INVALID_SETTLEMENT_STATUS: Cannot execute settlement in status '${settlement.status}'.`);
+      throw new Error(
+        `INVALID_SETTLEMENT_STATUS: Cannot execute settlement in status '${settlement.status}'.`,
+      );
     }
 
     settlement.status = 'SUBMITTING';
@@ -442,7 +478,10 @@ export class SettlementService {
     const discrepancies: string[] = [];
 
     const expectedTotal = settlement.totalAllocated;
-    const observedTotal = txs.reduce((sum, t) => sum + (t.status === 'CONFIRMED' ? t.actualAmount : 0), 0);
+    const observedTotal = txs.reduce(
+      (sum, t) => sum + (t.status === 'CONFIRMED' ? t.actualAmount : 0),
+      0,
+    );
 
     const expectedRecipientCount = settlement.recipients.length;
     const observedRecipientCount = txs.filter((t) => t.status === 'CONFIRMED').length;
@@ -451,13 +490,17 @@ export class SettlementService {
     let mismatchedTransactions = 0;
 
     for (const recipient of settlement.recipients) {
-      const matchedTx = txs.find((t) => t.recipientRank === recipient.rank && t.recipientWallet === recipient.playerWallet);
+      const matchedTx = txs.find(
+        (t) => t.recipientRank === recipient.rank && t.recipientWallet === recipient.playerWallet,
+      );
       if (!matchedTx) {
-        discrepancies.push(`Missing confirmed transaction for Rank ${recipient.rank} (${recipient.playerWallet}).`);
+        discrepancies.push(
+          `Missing confirmed transaction for Rank ${recipient.rank} (${recipient.playerWallet}).`,
+        );
         mismatchedTransactions++;
       } else if (matchedTx.actualAmount !== recipient.amount) {
         discrepancies.push(
-          `Amount mismatch for Rank ${recipient.rank}: expected ${recipient.amount}, observed ${matchedTx.actualAmount}.`
+          `Amount mismatch for Rank ${recipient.rank}: expected ${recipient.amount}, observed ${matchedTx.actualAmount}.`,
         );
         mismatchedTransactions++;
       } else {

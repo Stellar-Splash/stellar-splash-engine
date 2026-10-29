@@ -83,7 +83,9 @@ describe('Deterministic Replay & Verification Engine', () => {
     const verification = ReplayService.verifyMatch(session, validResult, corruptedEvents);
 
     expect(verification.status).toBe('REJECTED');
-    expect(verification.rejectionReason).toContain('Sequence numbering must be strictly monotonically increasing');
+    expect(verification.rejectionReason).toContain(
+      'Sequence numbering must be strictly monotonically increasing',
+    );
   });
 
   it('rejects events with backwards timestamps', () => {
@@ -136,7 +138,11 @@ describe('Deterministic Replay & Verification Engine', () => {
       { seq: 2, timestamp: 1005010, type: 'TARGET_HIT', points: 100, combo: 2, multiplier: 1 },
     ];
 
-    const verification = ReplayService.verifyMatch(session, { ...validResult, finalScore: 200 }, macroEvents);
+    const verification = ReplayService.verifyMatch(
+      session,
+      { ...validResult, finalScore: 200 },
+      macroEvents,
+    );
     expect(verification.status).toBe('REJECTED');
     expect(verification.rejectionReason).toContain('INHUMAN_CLICK_VELOCITY');
   });
@@ -160,7 +166,11 @@ describe('Deterministic Replay & Verification Engine', () => {
       },
     ];
 
-    const verification = ReplayService.verifyMatch(session, { ...validResult, finalScore: 100 }, outOfBoundsEvents);
+    const verification = ReplayService.verifyMatch(
+      session,
+      { ...validResult, finalScore: 100 },
+      outOfBoundsEvents,
+    );
     expect(verification.status).toBe('REJECTED');
     expect(verification.rejectionReason).toContain('GEOMETRIC_OUT_OF_BOUNDS');
   });

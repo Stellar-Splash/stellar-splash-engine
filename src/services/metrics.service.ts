@@ -72,12 +72,16 @@ export class MetricsService {
 
     // 2. Active SSE clients
     const activeClients = EventBusService.getSubscriberCount();
-    lines.push('# HELP sse_active_clients_total Currently connected Server-Sent Event stream clients.');
+    lines.push(
+      '# HELP sse_active_clients_total Currently connected Server-Sent Event stream clients.',
+    );
     lines.push('# TYPE sse_active_clients_total gauge');
     lines.push(`sse_active_clients_total ${activeClients}`);
 
     // 3. Matches
-    lines.push('# HELP splash_matches_total Total gameplay matches processed by verification engine.');
+    lines.push(
+      '# HELP splash_matches_total Total gameplay matches processed by verification engine.',
+    );
     lines.push('# TYPE splash_matches_total counter');
     lines.push(`splash_matches_total{status="verified"} ${this.state.matchesPlayed.verified}`);
     lines.push(`splash_matches_total{status="failed"} ${this.state.matchesPlayed.failed}`);
@@ -95,14 +99,18 @@ export class MetricsService {
     lines.push(`splash_settlement_latency_seconds_count ${this.state.settlementLatencyCount}`);
 
     // 5. HTTP requests
-    lines.push('# HELP http_requests_total Total HTTP requests handled by method, path, and status code.');
+    lines.push(
+      '# HELP http_requests_total Total HTTP requests handled by method, path, and status code.',
+    );
     lines.push('# TYPE http_requests_total counter');
     for (const [key, count] of Object.entries(this.state.httpRequests)) {
       const parts = key.split('_');
       const method = parts[0];
       const status = parts[parts.length - 1];
       const route = parts.slice(1, -1).join('_');
-      lines.push(`http_requests_total{method="${method}",path="${route}",status="${status}"} ${count}`);
+      lines.push(
+        `http_requests_total{method="${method}",path="${route}",status="${status}"} ${count}`,
+      );
     }
 
     return lines.join('\n') + '\n';

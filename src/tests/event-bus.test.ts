@@ -20,7 +20,9 @@ describe('EventBusService with SSE Heartbeat', () => {
     expect(EventBusService.getSubscriberCount()).toBe(1);
 
     EventBusService.broadcast('TOURNAMENT_CREATED', { tournamentId: 't1' });
-    expect(mockRes.write).toHaveBeenCalledWith(expect.stringContaining('event: TOURNAMENT_CREATED'));
+    expect(mockRes.write).toHaveBeenCalledWith(
+      expect.stringContaining('event: TOURNAMENT_CREATED'),
+    );
 
     EventBusService.removeSubscriber(mockRes);
     expect(EventBusService.getSubscriberCount()).toBe(0);

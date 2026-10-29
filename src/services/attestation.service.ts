@@ -67,7 +67,7 @@ export class AttestationService {
    */
   public static verifyAttestation(
     attestation: ResultAttestation,
-    verification: ResultVerification
+    verification: ResultVerification,
   ): boolean {
     if (
       attestation.tournamentId !== verification.tournamentId ||

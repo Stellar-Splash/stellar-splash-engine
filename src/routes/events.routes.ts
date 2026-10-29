@@ -10,7 +10,9 @@ router.get('/', (req: Request, res: Response) => {
   res.flushHeaders();
 
   // Send initial connection packet
-  res.write(`event: CONNECTED\ndata: ${JSON.stringify({ status: 'connected', timestamp: Date.now() })}\n\n`);
+  res.write(
+    `event: CONNECTED\ndata: ${JSON.stringify({ status: 'connected', timestamp: Date.now() })}\n\n`,
+  );
 
   EventBusService.addSubscriber(res);
 

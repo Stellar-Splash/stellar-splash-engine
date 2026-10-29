@@ -178,12 +178,7 @@ export interface FinalRankingRecord {
 // ----------------------------------------------------------------------
 
 export type AgreementStatus =
-  | 'DRAFT'
-  | 'PENDING_APPROVAL'
-  | 'READY_TO_LOCK'
-  | 'LOCKED'
-  | 'SUPERSEDED'
-  | 'REJECTED';
+  'DRAFT' | 'PENDING_APPROVAL' | 'READY_TO_LOCK' | 'LOCKED' | 'SUPERSEDED' | 'REJECTED';
 
 export interface AllocationRule {
   rank: number;

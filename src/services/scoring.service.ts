@@ -106,7 +106,7 @@ export class ScoringService {
     session: MatchSession,
     breakdown: ScoreBreakdown,
     endTime: number,
-    eventsCount: number
+    eventsCount: number,
   ): string {
     const canonicalPayload = JSON.stringify({
       matchId: session.matchId,
@@ -135,7 +135,7 @@ export class ScoringService {
   public static buildGameResult(
     session: MatchSession,
     events: GameEvent[],
-    endTime: number
+    endTime: number,
   ): GameResult {
     const breakdown = this.calculateScore(events);
     const resultHash = this.computeResultHash(session, breakdown, endTime, events.length);
@@ -168,11 +168,13 @@ export class ScoringService {
    */
   public static calculatePrizePoolBpsShares(
     totalPrizeStroops: bigint,
-    allocations: Array<{ rank: number; basisPoints: number }>
+    allocations: Array<{ rank: number; basisPoints: number }>,
   ): Array<{ rank: number; basisPoints: number; shareStroops: bigint; isDustRecipient: boolean }> {
     const totalBps = allocations.reduce((sum, item) => sum + item.basisPoints, 0);
     if (totalBps !== 10_000) {
-      throw new Error(`INVALID_BPS_SUM: Basis points sum (${totalBps}) must equal exactly 10,000 bps.`);
+      throw new Error(
+        `INVALID_BPS_SUM: Basis points sum (${totalBps}) must equal exactly 10,000 bps.`,
+      );
     }
 
     const sorted = [...allocations].sort((a, b) => a.rank - b.rank);

@@ -60,7 +60,8 @@ export class PrizePoolController {
       if (existing && existing.tournamentId === id) {
         res.status(200).json({
           success: true,
-          message: 'Transaction already verified and consumed for this tournament (idempotent response).',
+          message:
+            'Transaction already verified and consumed for this tournament (idempotent response).',
           funding: existing,
           tournament,
         });
@@ -69,7 +70,8 @@ export class PrizePoolController {
 
       res.status(409).json({
         success: false,
-        error: 'DUPLICATE_TRANSACTION: This Stellar transaction has already been consumed by another tournament.',
+        error:
+          'DUPLICATE_TRANSACTION: This Stellar transaction has already been consumed by another tournament.',
       });
       return;
     }

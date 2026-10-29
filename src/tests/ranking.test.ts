@@ -181,6 +181,8 @@ describe('Deterministic Tournament Rankings Engine', () => {
     expect(bytes.toString('hex')).toBe(hash1);
 
     expect(RankingService.verifyRankingHash(hash1, tournamentId, 1, entries)).toBe(true);
-    expect(RankingService.verifyRankingHash('deadbeef'.repeat(8), tournamentId, 1, entries)).toBe(false);
+    expect(RankingService.verifyRankingHash('deadbeef'.repeat(8), tournamentId, 1, entries)).toBe(
+      false,
+    );
   });
 });

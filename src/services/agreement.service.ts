@@ -12,7 +12,11 @@ export class AgreementService {
   /**
    * Validates that allocation rules sum exactly to 10,000 basis points (100.00%).
    */
-  public static validateBasisPoints(rules: AllocationRule[]): { valid: boolean; totalBps: number; error?: string } {
+  public static validateBasisPoints(rules: AllocationRule[]): {
+    valid: boolean;
+    totalBps: number;
+    error?: string;
+  } {
     if (!rules || rules.length === 0) {
       return { valid: false, totalBps: 0, error: 'At least one allocation rule is required.' };
     }
@@ -76,7 +80,7 @@ export class AgreementService {
    */
   public static calculateSettlementAllocations(
     totalAmount: number,
-    rules: AllocationRule[]
+    rules: AllocationRule[],
   ): { rank: number; basisPoints: number; amount: number; isResidualRecipient: boolean }[] {
     return this.calculatePayouts(totalAmount, rules).map((p) => ({
       rank: p.rank,

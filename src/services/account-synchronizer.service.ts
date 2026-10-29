@@ -88,7 +88,7 @@ export class AccountSynchronizerService {
    */
   public static async reconcileVaultObligations(
     vaultAddress: string = CONFIG.DEFAULT_VAULT_ADDRESS,
-    tournaments?: Tournament[]
+    tournaments?: Tournament[],
   ): Promise<VaultReconciliationSummary> {
     const balanceInfo = await this.fetchVaultAccountBalance(vaultAddress);
     const allTournaments = tournaments || StoreService.getAllTournaments();
@@ -97,9 +97,7 @@ export class AccountSynchronizerService {
     const activeStates: Array<Tournament['state']> = ['OPEN', 'FULL', 'IN_PROGRESS', 'FUNDING'];
     const active = allTournaments.filter(
       (t) =>
-        t.vaultAddress === vaultAddress &&
-        activeStates.includes(t.state) &&
-        t.prizeAsset === 'XLM'
+        t.vaultAddress === vaultAddress && activeStates.includes(t.state) && t.prizeAsset === 'XLM',
     );
 
     const totalEscrowObligationXLM = active.reduce((sum, t) => sum + t.prizePoolAmount, 0);

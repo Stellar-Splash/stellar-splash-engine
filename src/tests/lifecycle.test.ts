@@ -78,7 +78,11 @@ describe('LifecycleService State Machine Validator', () => {
     const tournament = createMockTournament({ state: 'DRAFT' });
     const initialUpdated = tournament.updatedAt;
 
-    const event = LifecycleService.applyTransition(tournament, 'FUNDING', 'Creator requested funding phase');
+    const event = LifecycleService.applyTransition(
+      tournament,
+      'FUNDING',
+      'Creator requested funding phase',
+    );
 
     expect(tournament.state).toBe('FUNDING');
     expect(tournament.updatedAt).toBeGreaterThanOrEqual(initialUpdated);

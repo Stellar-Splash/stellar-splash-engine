@@ -53,7 +53,7 @@ describe('PrngService - Deterministic Seeded Target Generation', () => {
       targets,
       firstTarget.x,
       firstTarget.y,
-      firstTarget.spawnTimeMs + 500
+      firstTarget.spawnTimeMs + 500,
     );
     expect(hitResult.valid).toBe(true);
     expect(hitResult.target?.id).toEqual(firstTarget.id);
@@ -63,7 +63,7 @@ describe('PrngService - Deterministic Seeded Target Generation', () => {
       targets,
       firstTarget.x,
       firstTarget.y,
-      firstTarget.expireTimeMs + 500
+      firstTarget.expireTimeMs + 500,
     );
     expect(expiredHit.valid).toBe(false);
 
@@ -72,7 +72,7 @@ describe('PrngService - Deterministic Seeded Target Generation', () => {
       targets,
       firstTarget.x + 150,
       firstTarget.y + 150,
-      firstTarget.spawnTimeMs + 500
+      firstTarget.spawnTimeMs + 500,
     );
     expect(missedHit.valid).toBe(false);
   });

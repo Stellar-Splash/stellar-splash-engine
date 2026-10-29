@@ -90,13 +90,13 @@ export class RankingController {
       .map((r) => StoreService.getVerification(r.matchId))
       .filter((v): v is NonNullable<typeof v> => v !== undefined && v.status === 'VERIFIED');
 
-    const rankingVersion = (tournament.activeAgreementVersion || 1);
+    const rankingVersion = tournament.activeAgreementVersion || 1;
     const finalRecord = RankingService.finalizeTournamentRanking(
       tournamentId,
       verifications,
       results,
       parseResult.data.finalizedBy,
-      rankingVersion
+      rankingVersion,
     );
 
     StoreService.saveRanking(finalRecord);

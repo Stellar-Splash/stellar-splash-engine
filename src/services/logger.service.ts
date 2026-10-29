@@ -89,14 +89,14 @@ export class LoggerService {
   public static error(
     message: string,
     err?: Error | unknown,
-    context?: Record<string, unknown>
+    context?: Record<string, unknown>,
   ): void {
     const errorDetails =
       err instanceof Error
         ? { name: err.name, message: err.message, stack: err.stack }
         : err
-        ? { message: String(err) }
-        : undefined;
+          ? { message: String(err) }
+          : undefined;
 
     this.record({
       timestamp: new Date().toISOString(),

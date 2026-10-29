@@ -22,8 +22,7 @@ export class SlidingWindowRateLimiter {
   constructor(options: RateLimiterOptions = {}) {
     this.windowMs = options.windowMs ?? 60_000;
     this.maxRequests = options.maxRequests ?? 60;
-    this.message =
-      options.message ?? 'Too many requests. Please slow down and try again later.';
+    this.message = options.message ?? 'Too many requests. Please slow down and try again later.';
     this.keyGenerator =
       options.keyGenerator ??
       ((req: Request) => {
@@ -35,9 +34,12 @@ export class SlidingWindowRateLimiter {
       });
 
     // Cleanup stale entries every 2 windows
-    this.cleanupInterval = setInterval(() => {
-      this.evictStaleEntries();
-    }, Math.max(10_000, this.windowMs * 2));
+    this.cleanupInterval = setInterval(
+      () => {
+        this.evictStaleEntries();
+      },
+      Math.max(10_000, this.windowMs * 2),
+    );
 
     if (this.cleanupInterval.unref) {
       this.cleanupInterval.unref();

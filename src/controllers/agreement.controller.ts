@@ -24,7 +24,7 @@ export const CreateAgreementSchema = z.object({
         rank: z.number().int().positive(),
         basisPoints: z.number().int().min(1).max(10000),
         label: z.string().min(1).max(64),
-      })
+      }),
     )
     .min(1)
     .refine(
@@ -32,7 +32,10 @@ export const CreateAgreementSchema = z.object({
         const sum = rules.reduce((acc, r) => acc + r.basisPoints, 0);
         return sum === 10000;
       },
-      { message: 'Sum of basis points across all allocation rules must equal exactly 10,000 (100.00%)' }
+      {
+        message:
+          'Sum of basis points across all allocation rules must equal exactly 10,000 (100.00%)',
+      },
     ),
   createdBy: z.string().min(56).max(56),
 });

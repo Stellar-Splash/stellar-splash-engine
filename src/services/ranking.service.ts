@@ -13,11 +13,11 @@ export class RankingService {
    */
   public static calculateRankings(
     verifications: ResultVerification[],
-    results: GameResult[]
+    results: GameResult[],
   ): RankingEntry[] {
     // Build set of match IDs that are strictly VERIFIED
     const verifiedMatchIds = new Set(
-      verifications.filter((v) => v.status === 'VERIFIED').map((v) => v.matchId)
+      verifications.filter((v) => v.status === 'VERIFIED').map((v) => v.matchId),
     );
 
     // Filter results to only verified matches
@@ -74,7 +74,7 @@ export class RankingService {
   public static generateRankingHash(
     tournamentId: string,
     version: number,
-    entries: RankingEntry[]
+    entries: RankingEntry[],
   ): string {
     return CanonicalService.computeRankingHash(tournamentId, version, entries);
   }
@@ -86,7 +86,7 @@ export class RankingService {
   public static generateRankingHashBytes(
     tournamentId: string,
     version: number,
-    entries: RankingEntry[]
+    entries: RankingEntry[],
   ): Buffer {
     const hex = this.generateRankingHash(tournamentId, version, entries);
     return Buffer.from(hex, 'hex');
@@ -99,7 +99,7 @@ export class RankingService {
     expectedHash: string,
     tournamentId: string,
     version: number,
-    entries: RankingEntry[]
+    entries: RankingEntry[],
   ): boolean {
     const computed = this.generateRankingHash(tournamentId, version, entries);
     return computed.toLowerCase() === expectedHash.toLowerCase();
@@ -113,7 +113,7 @@ export class RankingService {
     verifications: ResultVerification[],
     results: GameResult[],
     finalizedBy: string,
-    rankingVersion: number = 1
+    rankingVersion: number = 1,
   ): FinalRankingRecord {
     const entries = this.calculateRankings(verifications, results);
     const rankingHash = this.generateRankingHash(tournamentId, rankingVersion, entries);
@@ -135,7 +135,7 @@ export class RankingService {
     tournamentId: string,
     verifiedResults: GameResult[],
     rankingVersion: number = 1,
-    finalizedBy: string = 'system'
+    finalizedBy: string = 'system',
   ): FinalRankingRecord {
     // Create synthetic verifications for already-verified results
     const verifications: ResultVerification[] = verifiedResults
@@ -162,7 +162,7 @@ export class RankingService {
       verifications,
       verifiedResults,
       finalizedBy,
-      rankingVersion
+      rankingVersion,
     );
   }
 }

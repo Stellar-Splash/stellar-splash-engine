@@ -19,7 +19,7 @@ describe('Match Seed Derivation & Anti-Precomputation Verification', () => {
     const differentWalletSeed = ReplayService.deriveCanonicalSeed(
       tournamentId,
       matchId,
-      'GBOXWCV7T4KQL3ZPL2GB6V2A73VUX6KAZD66N6E64B44J7K3XW6P2W3V'
+      'GBOXWCV7T4KQL3ZPL2GB6V2A73VUX6KAZD66N6E64B44J7K3XW6P2W3V',
     );
     expect(differentWalletSeed).not.toBe(seed1);
   });
@@ -30,7 +30,7 @@ describe('Match Seed Derivation & Anti-Precomputation Verification', () => {
       tournamentId,
       matchId,
       playerWallet,
-      canonical
+      canonical,
     );
 
     expect(verification.valid).toBe(true);
@@ -46,7 +46,7 @@ describe('Match Seed Derivation & Anti-Precomputation Verification', () => {
       tournamentId,
       matchId,
       playerWallet,
-      fraudulentSeed
+      fraudulentSeed,
     );
 
     expect(verification.valid).toBe(false);

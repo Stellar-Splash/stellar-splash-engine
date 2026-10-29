@@ -42,7 +42,8 @@ export class StoreService {
     const defaultTournament: Tournament = {
       id: 'tourn-splash-001',
       name: 'Splash Rush Genesis Cup',
-      description: 'The inaugural skill championship on Stellar Splash. Race the clock and claim the pool!',
+      description:
+        'The inaugural skill championship on Stellar Splash. Race the clock and claim the pool!',
       gameId: 'splash-rush',
       gameVersion: CONFIG.GAME_VERSIONS['splash-rush'],
       creatorWallet: 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
@@ -216,7 +217,10 @@ export class StoreService {
     return this.participants.get(tournamentId) || [];
   }
 
-  public static getParticipant(tournamentId: string, playerWallet: string): TournamentParticipant | undefined {
+  public static getParticipant(
+    tournamentId: string,
+    playerWallet: string,
+  ): TournamentParticipant | undefined {
     const list = this.getParticipants(tournamentId);
     return list.find((p) => p.playerWallet === playerWallet);
   }
@@ -240,7 +244,11 @@ export class StoreService {
     });
   }
 
-  public static updateParticipantScore(tournamentId: string, playerWallet: string, score: number): void {
+  public static updateParticipantScore(
+    tournamentId: string,
+    playerWallet: string,
+    score: number,
+  ): void {
     const list = this.getParticipants(tournamentId);
     const p = list.find((item) => item.playerWallet === playerWallet);
     if (p) {
@@ -476,7 +484,11 @@ export class StoreService {
       t.settlementId = settlement.settlementId;
       if (settlement.status === 'SETTLED' || settlement.status === 'RECONCILED') {
         t.state = 'SETTLED';
-      } else if (settlement.status === 'SUBMITTING' || settlement.status === 'CONFIRMING' || settlement.status === 'AUTHORIZED') {
+      } else if (
+        settlement.status === 'SUBMITTING' ||
+        settlement.status === 'CONFIRMING' ||
+        settlement.status === 'AUTHORIZED'
+      ) {
         t.state = 'SETTLING';
       }
       this.saveTournament(t);
@@ -506,7 +518,10 @@ export class StoreService {
   }
 
   // --- Settlement Transactions ---
-  public static saveSettlementTransactions(settlementId: string, transactions: SettlementTransactionRecord[]): void {
+  public static saveSettlementTransactions(
+    settlementId: string,
+    transactions: SettlementTransactionRecord[],
+  ): void {
     this.settlementTransactions.set(settlementId, transactions);
   }
 
@@ -525,7 +540,9 @@ export class StoreService {
     });
   }
 
-  public static getSettlementReconciliation(settlementId: string): SettlementReconciliationRecord | undefined {
+  public static getSettlementReconciliation(
+    settlementId: string,
+  ): SettlementReconciliationRecord | undefined {
     return this.settlementReconciliations.get(settlementId);
   }
 
@@ -659,4 +676,3 @@ export class StoreService {
     }
   }
 }
-

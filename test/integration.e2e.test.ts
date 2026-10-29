@@ -30,17 +30,19 @@ describe('End-to-End Tournament Lifecycle Integration Test', () => {
 
     // 1. Create Tournament
     const now = Date.now();
-    const createRes = await request(app).post('/api/tournaments').send({
-      name: 'Stellar Splash E2E Championship',
-      description: 'End-to-end integration test tournament',
-      gameId: 'splash-rush',
-      creatorWallet,
-      prizeAsset: 'USDC',
-      prizePoolAmount: 500,
-      maxParticipants: 8,
-      startTime: now,
-      endTime: now + 3600_000,
-    });
+    const createRes = await request(app)
+      .post('/api/tournaments')
+      .send({
+        name: 'Stellar Splash E2E Championship',
+        description: 'End-to-end integration test tournament',
+        gameId: 'splash-rush',
+        creatorWallet,
+        prizeAsset: 'USDC',
+        prizePoolAmount: 500,
+        maxParticipants: 8,
+        startTime: now,
+        endTime: now + 3600_000,
+      });
 
     expect(createRes.status).toBe(201);
     expect(createRes.body.success).toBe(true);
@@ -85,8 +87,22 @@ describe('End-to-End Tournament Lifecycle Integration Test', () => {
     const matchStartTime = Date.now();
     const matchEndTime = matchStartTime + 45000;
     const events = [
-      { seq: 1, timestamp: matchStartTime + 5000, type: 'TARGET_HIT', points: 100, combo: 1, multiplier: 1 },
-      { seq: 2, timestamp: matchStartTime + 10000, type: 'TARGET_HIT', points: 150, combo: 2, multiplier: 2 },
+      {
+        seq: 1,
+        timestamp: matchStartTime + 5000,
+        type: 'TARGET_HIT',
+        points: 100,
+        combo: 1,
+        multiplier: 1,
+      },
+      {
+        seq: 2,
+        timestamp: matchStartTime + 10000,
+        type: 'TARGET_HIT',
+        points: 150,
+        combo: 2,
+        multiplier: 2,
+      },
     ];
 
     const matchComplete = await request(app).post('/api/games/complete').send({
@@ -104,16 +120,16 @@ describe('End-to-End Tournament Lifecycle Integration Test', () => {
     expect(verifyRes.body.verification.status).toBe('VERIFIED');
 
     // 7. Create, Approve, and Lock Prize Agreement (Winner Take All)
-    const createAgr = await request(app).post('/api/agreements').send({
-      tournamentId,
-      version: 1,
-      prizeAsset: 'USDC',
-      prizePoolAmount: 500,
-      allocationRules: [
-        { rank: 1, basisPoints: 10000, label: 'Winner Take All' },
-      ],
-      createdBy: creatorWallet,
-    });
+    const createAgr = await request(app)
+      .post('/api/agreements')
+      .send({
+        tournamentId,
+        version: 1,
+        prizeAsset: 'USDC',
+        prizePoolAmount: 500,
+        allocationRules: [{ rank: 1, basisPoints: 10000, label: 'Winner Take All' }],
+        createdBy: creatorWallet,
+      });
     expect(createAgr.status).toBe(201);
 
     const approveAgr = await request(app)

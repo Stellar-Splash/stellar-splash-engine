@@ -11,7 +11,9 @@ describe('LoggerService - Structured Logging Abstraction', () => {
     LoggerService.debug('Debugging database connection', { pool: 'master' });
     LoggerService.info('Tournament created', { tournamentId: 't-123' });
     LoggerService.warn('High memory usage detected', { usagePercent: 88 });
-    LoggerService.error('Transaction simulation failed', new Error('RPC_TIMEOUT'), { txHash: '0xabc' });
+    LoggerService.error('Transaction simulation failed', new Error('RPC_TIMEOUT'), {
+      txHash: '0xabc',
+    });
 
     const history = LoggerService.getHistory();
     expect(history).toHaveLength(4);

@@ -19,7 +19,7 @@ export class ReplayService {
     session: MatchSession,
     reasonCode: string,
     description: string,
-    telemetry?: Record<string, unknown>
+    telemetry?: Record<string, unknown>,
   ): void {
     StoreService.logAudit('ANTI_CHEAT_FRAUD_FLAG', session.playerWallet, {
       matchId: session.matchId,
@@ -38,9 +38,7 @@ export class ReplayService {
     tournamentId?: string;
     playerWallet?: string;
   }): AuditEvent[] {
-    const all = StoreService.getAuditLogs().filter(
-      (l) => l.eventType === 'ANTI_CHEAT_FRAUD_FLAG'
-    );
+    const all = StoreService.getAuditLogs().filter((l) => l.eventType === 'ANTI_CHEAT_FRAUD_FLAG');
     if (!filter) return all;
     return all.filter((l) => {
       const details = l.details as any;
@@ -56,7 +54,7 @@ export class ReplayService {
   public static deriveCanonicalSeed(
     tournamentId: string,
     matchId: string,
-    playerWallet: string
+    playerWallet: string,
   ): string {
     return crypto
       .createHash('sha256')
@@ -72,7 +70,7 @@ export class ReplayService {
     tournamentId: string,
     matchId: string,
     playerWallet: string,
-    claimedSeed: string
+    claimedSeed: string,
   ): {
     valid: boolean;
     canonicalSeed: string;
@@ -104,7 +102,7 @@ export class ReplayService {
   public static verifyMatch(
     session: MatchSession,
     submittedResult: GameResult,
-    events: GameEvent[]
+    events: GameEvent[],
   ): ResultVerification {
     const verificationId = `verif-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
@@ -139,7 +137,10 @@ export class ReplayService {
     for (const evt of events) {
       if (evt.seq <= lastSeq) {
         const rejectionReason = `NON_MONOTONIC_SEQUENCE: Sequence numbering must be strictly monotonically increasing. Event seq ${evt.seq} is not strictly greater than previous ${lastSeq}.`;
-        this.logFraudFlag(session, 'NON_MONOTONIC_SEQUENCE', rejectionReason, { seq: evt.seq, lastSeq });
+        this.logFraudFlag(session, 'NON_MONOTONIC_SEQUENCE', rejectionReason, {
+          seq: evt.seq,
+          lastSeq,
+        });
         return {
           verificationId,
           matchId: session.matchId,
@@ -161,7 +162,10 @@ export class ReplayService {
 
       if (evt.timestamp < lastTimestamp) {
         const rejectionReason = `OUT_OF_ORDER_TIMESTAMP: Non-monotonic event timestamp. Event timestamp ${evt.timestamp} precedes previous ${lastTimestamp}.`;
-        this.logFraudFlag(session, 'OUT_OF_ORDER_TIMESTAMP', rejectionReason, { timestamp: evt.timestamp, lastTimestamp });
+        this.logFraudFlag(session, 'OUT_OF_ORDER_TIMESTAMP', rejectionReason, {
+          timestamp: evt.timestamp,
+          lastTimestamp,
+        });
         return {
           verificationId,
           matchId: session.matchId,
@@ -192,7 +196,10 @@ export class ReplayService {
       // Inhuman click interval: < 35ms implies > 28 CPS
       if (deltaMs < 35 && deltaMs >= 0) {
         const rejectionReason = `INHUMAN_CLICK_VELOCITY: Event intervals of ${deltaMs}ms detected exceeding maximum human physical response threshold (35ms / 28 CPS).`;
-        this.logFraudFlag(session, 'INHUMAN_CLICK_VELOCITY', rejectionReason, { deltaMs, eventIndex: i });
+        this.logFraudFlag(session, 'INHUMAN_CLICK_VELOCITY', rejectionReason, {
+          deltaMs,
+          eventIndex: i,
+        });
         return {
           verificationId,
           matchId: session.matchId,
@@ -229,11 +236,16 @@ export class ReplayService {
             clickY,
             targetX,
             targetY,
-            targetRadius
+            targetRadius,
           );
           if (!valid) {
             const rejectionReason = `GEOMETRIC_OUT_OF_BOUNDS: Target hit registered at distance ${distance.toFixed(1)}px outside target bounding radius (${targetRadius}px + 10px tolerance).`;
-            this.logFraudFlag(session, 'GEOMETRIC_OUT_OF_BOUNDS', rejectionReason, { distance, targetRadius, clickX, clickY });
+            this.logFraudFlag(session, 'GEOMETRIC_OUT_OF_BOUNDS', rejectionReason, {
+              distance,
+              targetRadius,
+              clickX,
+              clickY,
+            });
             return {
               verificationId,
               matchId: session.matchId,
@@ -295,12 +307,19 @@ export class ReplayService {
 
     // 5. Canonicalize and check result hash
     const normalizedEvents = CanonicalService.normalizeEvents(events);
-    const canonicalJson = CanonicalService.canonicalizeResult(session, breakdown as any, normalizedEvents);
+    const canonicalJson = CanonicalService.canonicalizeResult(
+      session,
+      breakdown as any,
+      normalizedEvents,
+    );
     const expectedHash = CanonicalService.computeResultHash(canonicalJson);
 
     if (!scoreMatch) {
       const rejectionReason = `SCORE_DISCREPANCY: Score mismatch. Submitted score (${submittedResult.finalScore}) does not match independently replayed score (${replayedScore}).`;
-      this.logFraudFlag(session, 'SCORE_DISCREPANCY', rejectionReason, { submittedScore: submittedResult.finalScore, replayedScore });
+      this.logFraudFlag(session, 'SCORE_DISCREPANCY', rejectionReason, {
+        submittedScore: submittedResult.finalScore,
+        replayedScore,
+      });
       return {
         verificationId,
         matchId: session.matchId,
@@ -348,7 +367,7 @@ export class ReplayService {
     targetX: number,
     targetY: number,
     radius: number,
-    tolerance = 10
+    tolerance = 10,
   ): { valid: boolean; distance: number } {
     const dx = clickX - targetX;
     const dy = clickY - targetY;

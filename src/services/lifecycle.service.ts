@@ -45,7 +45,7 @@ export class LifecycleService {
   public static validateTransition(
     tournament: Tournament,
     toState: TournamentState,
-    reason?: string
+    reason?: string,
   ): StateTransitionEvent {
     const fromState = tournament.state;
 
@@ -54,7 +54,7 @@ export class LifecycleService {
       throw new AppError(
         `Cannot transition tournament ${tournament.id} from terminal state '${fromState}' to '${toState}'.`,
         400,
-        'ILLEGAL_LIFECYCLE_TRANSITION'
+        'ILLEGAL_LIFECYCLE_TRANSITION',
       );
     }
 
@@ -62,7 +62,7 @@ export class LifecycleService {
       throw new AppError(
         `Illegal state transition from '${fromState}' to '${toState}'. Allowed transitions: [${ALLOWED_TRANSITIONS[fromState].join(', ')}].`,
         400,
-        'INVALID_STATE_TRANSITION'
+        'INVALID_STATE_TRANSITION',
       );
     }
 
@@ -72,7 +72,7 @@ export class LifecycleService {
         throw new AppError(
           `Cannot transition tournament to OPEN without verified on-chain prize funding.`,
           400,
-          'UNFUNDED_TOURNAMENT_ERROR'
+          'UNFUNDED_TOURNAMENT_ERROR',
         );
       }
     }
@@ -82,7 +82,7 @@ export class LifecycleService {
         throw new AppError(
           `Cannot start tournament without at least one registered participant.`,
           400,
-          'INSUFFICIENT_PARTICIPANTS'
+          'INSUFFICIENT_PARTICIPANTS',
         );
       }
     }
@@ -92,7 +92,7 @@ export class LifecycleService {
         throw new AppError(
           `Cannot settle tournament without a verified final ranking hash.`,
           400,
-          'MISSING_RANKING_HASH'
+          'MISSING_RANKING_HASH',
         );
       }
     }
@@ -112,7 +112,7 @@ export class LifecycleService {
   public static applyTransition(
     tournament: Tournament,
     toState: TournamentState,
-    reason?: string
+    reason?: string,
   ): StateTransitionEvent {
     const event = this.validateTransition(tournament, toState, reason);
     tournament.state = toState;

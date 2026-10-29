@@ -34,8 +34,22 @@ describe('Match Replay Snapshot Exporter & Audit Verification', () => {
       endTime: now,
       status: 'COMPLETED',
       events: [
-        { seq: 1, timestamp: now - 28000, type: 'TARGET_HIT', points: 100, combo: 1, multiplier: 1 },
-        { seq: 2, timestamp: now - 25000, type: 'TARGET_HIT', points: 100, combo: 2, multiplier: 1 },
+        {
+          seq: 1,
+          timestamp: now - 28000,
+          type: 'TARGET_HIT',
+          points: 100,
+          combo: 1,
+          multiplier: 1,
+        },
+        {
+          seq: 2,
+          timestamp: now - 25000,
+          type: 'TARGET_HIT',
+          points: 100,
+          combo: 2,
+          multiplier: 1,
+        },
       ],
     };
 

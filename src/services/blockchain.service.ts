@@ -39,7 +39,8 @@ export class BlockchainService {
     if (!txHash || txHash.length !== 64 || !/^[0-9a-fA-F]+$/.test(txHash)) {
       return {
         valid: false,
-        error: 'INVALID_TX_HASH_FORMAT: Transaction hash must be a 64-character hexadecimal string.',
+        error:
+          'INVALID_TX_HASH_FORMAT: Transaction hash must be a 64-character hexadecimal string.',
         txHash,
       };
     }
@@ -60,13 +61,14 @@ export class BlockchainService {
       // 2. Query operations in transaction
       const ops = await this.horizonServer.operations().forTransaction(txHash).call();
       const paymentOps = ops.records.filter(
-        (op) => op.type === 'payment' || op.type === 'create_account'
+        (op) => op.type === 'payment' || op.type === 'create_account',
       );
 
       if (paymentOps.length === 0) {
         return {
           valid: false,
-          error: 'NO_PAYMENT_OPERATION: Transaction does not contain a payment or transfer operation.',
+          error:
+            'NO_PAYMENT_OPERATION: Transaction does not contain a payment or transfer operation.',
           txHash,
           successful: true,
         };
