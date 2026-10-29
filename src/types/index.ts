@@ -374,6 +374,7 @@ export * from './entry-fee';
 export * from './attestation';
 export * from './session-token';
 export * from './player-tier';
+export * from './admin-security';
 
 
 
