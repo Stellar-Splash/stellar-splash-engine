@@ -17,3 +17,4 @@ const outFile = path.join(outDir, 'mock-tournaments.json');
 fs.writeFileSync(outFile, JSON.stringify(mockTournaments, null, 2), 'utf8');
 
 console.log(`✅ Seeded ${mockTournaments.length} mock tournaments to ${outFile}`);
+

@@ -33,3 +33,4 @@ describe('Docker Healthcheck Response Parser', () => {
     expect(parsed.status).toBe('error');
   });
 });
+

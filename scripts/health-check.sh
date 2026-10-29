@@ -21,3 +21,4 @@ if [ "$STATUS" != "ok" ]; then
 fi
 
 echo "✅ Engine health probe OK (status=$STATUS)"
+

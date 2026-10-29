@@ -40,3 +40,4 @@ if (heapDiffMb > 25) {
 }
 
 console.log('✅ Memory benchmark completed: No significant heap leakage detected.');
+

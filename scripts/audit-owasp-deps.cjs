@@ -10,3 +10,4 @@ try {
   console.warn('⚠️ Advisories found in dependencies; inspect audit log.');
   process.exit(0);
 }
+

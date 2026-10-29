@@ -29,3 +29,4 @@ console.log('Sample telemetry:');
 console.log(JSON.stringify(players[0], null, 2));
 
 console.log('✅ Synthetic load generator manifest verified successfully.');
+

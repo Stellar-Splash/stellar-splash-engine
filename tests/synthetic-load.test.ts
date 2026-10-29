@@ -31,3 +31,4 @@ describe('Synthetic Load Generator', () => {
     expect(first.mouseMovementsCount).toBeGreaterThanOrEqual(40);
   });
 });
+

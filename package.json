@@ -15,7 +15,11 @@
     "precommit": "npm run typecheck && npm run format:check && npm test",
     "prepare": "git config core.hooksPath .githooks || exit 0",
     "backup": "tsx scripts/db-backup.ts",
-    "verify:all": "node scripts/verify-all.cjs"
+    "verify:all": "node scripts/verify-all.cjs",
+    "load-test": "node scripts/load-test-synthetic.cjs",
+    "benchmark:memory": "node scripts/benchmark-memory.cjs",
+    "audit:deps": "node scripts/audit-owasp-deps.cjs",
+    "export:openapi": "node scripts/export-openapi.cjs"
   },
   "keywords": [
     "stellar",

@@ -45,3 +45,4 @@ services:
 networks:
   splash-network:
     driver: bridge
+
