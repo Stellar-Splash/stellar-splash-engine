@@ -13,7 +13,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\"",
     "precommit": "npm run typecheck && npm run format:check && npm test",
-    "prepare": "git config core.hooksPath .githooks || exit 0"
+    "prepare": "git config core.hooksPath .githooks || exit 0",
+    "verify:all": "node scripts/verify-all.cjs"
   },
   "keywords": [
     "stellar",
