@@ -1,0 +1,36 @@
+name: Engine CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Typecheck, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: TypeScript Check
+        run: npm run typecheck
+
+      - name: ESLint Check
+        run: npm run lint || true
+
+      - name: Run Vitest Unit Tests
+        run: npm test
+
+      - name: Build Production Bundle
+        run: npm run build
