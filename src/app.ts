@@ -17,6 +17,10 @@ import antiCheatRoutes from './routes/anti-cheat.routes';
 import settlementDaemonRoutes from './routes/settlement-daemon.routes';
 import forensicRoutes from './routes/forensic.routes';
 import leaderboardStreamRoutes from './routes/leaderboard-stream.routes';
+import circuitBreakerRoutes from './routes/circuit-breaker.routes';
+import ledgerSyncRoutes from './routes/ledger-sync.routes';
+import openapiRoutes from './routes/openapi.routes';
+import webhookRoutes from './routes/webhook.routes';
 import { notFoundHandler, errorHandler } from './middleware/error.middleware';
 import { createRateLimiter, SlidingWindowRateLimiter } from './middleware/rate-limiter.middleware';
 import { requestIdMiddleware } from './middleware/request-id.middleware';
@@ -106,6 +110,10 @@ export const createApp = (): Express => {
   app.use('/api/daemon/settlement', settlementDaemonRoutes);
   app.use('/api/forensics', forensicRoutes);
   app.use('/api/leaderboard/live', leaderboardStreamRoutes);
+  app.use('/api/circuit-breaker', circuitBreakerRoutes);
+  app.use('/api/ledger', ledgerSyncRoutes);
+  app.use('/api/docs', openapiRoutes);
+  app.use('/api/webhooks', webhookRoutes);
 
   // 404 Catch-All Handler
   app.use(notFoundHandler);
