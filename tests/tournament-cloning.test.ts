@@ -41,7 +41,7 @@ describe('TournamentCloningService', () => {
 
     expect(cloned.id).toBe('clone-101');
     expect(cloned.name).toBe('Weekly Championship #002');
-    expect(cloned.state).toBe('CREATED');
+    expect(cloned.state).toBe('DRAFT');
     expect(cloned.currentParticipants).toBe(0);
     expect(cloned.prizePoolAmount).toBe(750);
     expect(cloned.maxParticipants).toBe(32);

@@ -1,14 +1,7 @@
 import { randomBytes } from 'crypto';
+import { SessionToken } from '../types/session-token';
 
-export interface SessionToken {
-  token: string;
-  matchId: string;
-  tournamentId: string;
-  playerWallet: string;
-  issuedAt: number;
-  expiresAt: number;
-  consumed: boolean;
-}
+export { SessionToken };
 
 /**
  * Service managing single-use cryptographic session tokens to prevent

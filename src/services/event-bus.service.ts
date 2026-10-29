@@ -21,7 +21,10 @@ export type PlatformEventType =
   | 'SETTLEMENT_CONFIRMED'
   | 'SETTLEMENT_RECONCILED'
   | 'SETTLEMENT_FAILED'
-  | 'SETTLEMENT_PARTIALLY_SETTLED';
+  | 'SETTLEMENT_PARTIALLY_SETTLED'
+  | 'DISPUTE_FILED'
+  | 'DISPUTE_RESOLVED'
+  | 'DISPUTE_DISMISSED';
 
 export interface PlatformEventPayload {
   type: PlatformEventType;

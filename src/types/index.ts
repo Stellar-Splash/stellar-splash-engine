@@ -372,4 +372,6 @@ export interface SettlementReconciliationRecord {
 
 export * from './entry-fee';
 export * from './attestation';
+export * from './session-token';
+
 

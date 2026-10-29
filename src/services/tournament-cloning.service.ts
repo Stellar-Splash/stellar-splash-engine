@@ -49,7 +49,7 @@ export class TournamentCloningService {
       currentParticipants: 0,
       startTime: options.startTime,
       endTime: options.endTime,
-      state: 'CREATED',
+      state: 'DRAFT',
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
