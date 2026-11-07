@@ -18,9 +18,10 @@ export interface RateLimitBypassOptions {
  * background workers and internal relay daemons.
  */
 export function rateLimitBypassMiddleware(options: RateLimitBypassOptions = {}) {
-  const authorizedTokens = options.bypassTokens || [
-    process.env.RATE_LIMIT_BYPASS_TOKEN || 'relay-daemon-bypass-token-stellar-splash-2026',
-  ];
+  const isProd = process.env.NODE_ENV === 'production';
+  const defaultTokens = isProd ? [] : ['relay-daemon-bypass-token-stellar-splash-2026'];
+  const envToken = process.env.RATE_LIMIT_BYPASS_TOKEN;
+  const authorizedTokens = options.bypassTokens || (envToken ? [envToken] : defaultTokens);
 
   return (req: Request, _res: Response, next: NextFunction): void => {
     const token = req.headers['x-rate-limit-bypass-token'] as string | undefined;

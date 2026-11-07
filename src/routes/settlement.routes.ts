@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { SettlementController } from '../controllers/settlement.controller';
+import { adminAuthMiddleware } from '../middleware/admin-auth.middleware';
 
 const router = Router();
 

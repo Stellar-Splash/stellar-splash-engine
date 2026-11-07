@@ -1,7 +1,13 @@
 import { createApp } from './app';
 import { CONFIG } from './config';
+import { StoreService } from './services/store.service';
 import { ShutdownService } from './services/shutdown.service';
 import { TournamentExpirationWorker } from './services/expiration.worker';
+
+// Load persisted state if available
+StoreService.initializePersistence().catch((err) => {
+  console.warn('Initial persistent snapshot load failed:', err);
+});
 
 const app = createApp();
 

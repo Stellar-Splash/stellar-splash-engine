@@ -80,6 +80,22 @@ export class SettlementController {
         return;
       }
 
+      const tournament = StoreService.getTournamentById(tournamentId);
+      if (tournament) {
+        const isCreator = tournament.creatorWallet.toLowerCase() === authorizedBy.toLowerCase();
+        const adminKey = req.headers['x-admin-key'] as string;
+        const isAdmin = adminKey && adminKey === process.env.ADMIN_SECRET;
+        const isSystem = authorizedBy === 'SYSTEM_AUTORUN' || authorizedBy.includes('verifier');
+        if (!isCreator && !isAdmin && !isSystem) {
+          res.status(403).json({
+            success: false,
+            error: 'UNAUTHORIZED_AUTHORIZER',
+            message: 'Only tournament creator or platform administrator may authorize settlement.',
+          });
+          return;
+        }
+      }
+
       const settlement = SettlementService.authorizeSettlement({
         tournamentId,
         authorizedBy,

@@ -5,6 +5,7 @@ import { StoreService } from '../services/store.service';
 import { ScoringService } from '../services/scoring.service';
 import { CanonicalService } from '../services/canonical.service';
 import { EventBusService } from '../services/event-bus.service';
+import { AnomalyDetectorService } from '../services/anomaly-detector.service';
 import { MatchSession, GameEvent } from '../types';
 import { CONFIG } from '../config';
 
@@ -20,15 +21,15 @@ const CompleteGameSchema = z.object({
   endTime: z.number().int().positive(),
   events: z.array(
     z.object({
-      seq: z.number().int(),
-      timestamp: z.number().int(),
+      seq: z.number().int().min(0),
+      timestamp: z.number().int().min(0),
       type: z.enum(['TARGET_HIT', 'COMBO_STREAK', 'HAZARD_HIT', 'MULTIPLIER_UP']),
-      points: z.number().int(),
-      combo: z.number().int(),
-      multiplier: z.number().int(),
+      points: z.number().int().min(-500).max(1000),
+      combo: z.number().int().min(0).max(1000),
+      multiplier: z.number().int().min(1).max(50),
       data: z.record(z.unknown()).optional(),
     }),
-  ),
+  ).max(5000),
 });
 
 export class GameController {
@@ -152,6 +153,18 @@ export class GameController {
         res.status(409).json({
           success: false,
           error: `REPLAY_ATTACK_DETECTED: This exact event sequence has already been submitted for match ${existingMatch}.`,
+        });
+        return;
+      }
+
+      // Macro and anomalous bot telemetry validation
+      const anomalyReport = AnomalyDetectorService.analyzeMatchEvents(events as GameEvent[]);
+      if (anomalyReport.riskScore >= 90) {
+        res.status(422).json({
+          success: false,
+          error: 'ANOMALOUS_GAMEPLAY_DETECTED',
+          message: 'Match rejected due to high anti-cheat risk score',
+          flags: anomalyReport.flags,
         });
         return;
       }

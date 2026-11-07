@@ -11,11 +11,17 @@ export interface AdminAuthOptions {
  * Middleware restricting access to authorized platform administrators.
  */
 export function adminAuthMiddleware(options: AdminAuthOptions = {}) {
-  const adminSecret = options.customSecret || process.env.ADMIN_SECRET || 'stellar-splash-super-secret-admin-key-2026';
-  const allowedWallets = (options.allowedWallets || [
-    'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
-    'GB7B2W55CDAF7KAZQ7QD3W577G5C2WCK73X42O4WJ4P7G7D8',
-  ]).map((w) => w.toLowerCase());
+  const isProd = process.env.NODE_ENV === 'production';
+  const defaultSecret = isProd ? undefined : 'stellar-splash-super-secret-admin-key-2026';
+  const adminSecret = options.customSecret || process.env.ADMIN_SECRET || defaultSecret;
+  const allowedWallets = (options.allowedWallets || (
+    isProd
+      ? (process.env.ADMIN_WALLETS ? process.env.ADMIN_WALLETS.split(',') : [])
+      : [
+          'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
+          'GB7B2W55CDAF7KAZQ7QD3W577G5C2WCK73X42O4WJ4P7G7D8',
+        ]
+  )).map((w) => w.trim().toLowerCase());
 
   return (req: Request, res: Response, next: NextFunction): void => {
     const adminKey =
@@ -27,12 +33,13 @@ export function adminAuthMiddleware(options: AdminAuthOptions = {}) {
     const callerWallet = req.headers['x-admin-wallet'] as string | undefined;
 
     // Check secret key match
-    if (adminKey && adminKey === adminSecret) {
+    if (adminSecret && adminKey && adminKey === adminSecret) {
       return next();
     }
 
-    // Check wallet whitelist match
-    if (callerWallet && allowedWallets.includes(callerWallet.toLowerCase())) {
+    // In non-production test/development environments, permit configured dev wallets.
+    // In production, wallet-only header spoofing is rejected; valid admin credentials are required.
+    if (!isProd && callerWallet && allowedWallets.includes(callerWallet.toLowerCase())) {
       return next();
     }
 

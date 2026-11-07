@@ -249,4 +249,36 @@ describe('Stellar Splash Engine API', () => {
       .send({ finalizedBy: creatorWallet });
     expect(secondFinalize.status).toBe(409);
   });
+
+  it('Rejects unauthenticated channel registration with HTTP 403', async () => {
+    const res = await request(app).post('/api/channels/register').send({
+      publicKey: 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
+      secretKey: 'SCXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+    });
+    expect(res.status).toBe(403);
+    expect(res.body.success).toBe(false);
+  });
+
+  it('Rejects game completion submissions with out-of-bounds scores', async () => {
+    const inflatedRes = await request(app)
+      .post('/api/games/complete')
+      .send({
+        matchId: 'match-bounds-test',
+        sessionToken: 'token-abc-123',
+        endTime: Date.now() + 45000,
+        events: [
+          { seq: 1, timestamp: 1000, type: 'TARGET_HIT', points: 9999999, combo: 1, multiplier: 1 },
+        ],
+      });
+    expect(inflatedRes.status).toBe(400);
+    expect(inflatedRes.body.success).toBe(false);
+    expect(inflatedRes.body.errors).toBeDefined();
+  });
+
+  it('Verifies global security headers on API responses', async () => {
+    const res = await request(app).get('/api/health');
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['x-frame-options']).toBe('DENY');
+    expect(res.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+  });
 });

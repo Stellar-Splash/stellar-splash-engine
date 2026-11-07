@@ -99,4 +99,30 @@ describe('adminAuthMiddleware', () => {
     const auditLogs = StoreService.getAuditLogs();
     expect(auditLogs.some((l) => l.eventType === 'ADMIN_AUTH_FAILED')).toBe(true);
   });
+
+  it('rejects unauthenticated x-admin-wallet header spoofing in production mode', () => {
+    const originalEnv = process.env.NODE_ENV;
+    try {
+      process.env.NODE_ENV = 'production';
+      const req = {
+        headers: { 'x-admin-wallet': 'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB' },
+        path: '/api/admin/upgrade',
+        method: 'POST',
+      } as unknown as Request;
+
+      const jsonMock = vi.fn();
+      const res = {
+        status: vi.fn().mockReturnValue({ json: jsonMock }),
+      } as unknown as Response;
+
+      const next = vi.fn() as NextFunction;
+      const middleware = adminAuthMiddleware();
+      middleware(req, res, next);
+
+      expect(next).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(403);
+    } finally {
+      process.env.NODE_ENV = originalEnv;
+    }
+  });
 });

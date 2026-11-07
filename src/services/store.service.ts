@@ -16,6 +16,7 @@ import {
 } from '../types';
 import { CONFIG } from '../config';
 import { AgreementService } from './agreement.service';
+import { PersistentStoreService } from './persistent-store.service';
 
 export class StoreService {
   private static tournaments: Map<string, Tournament> = new Map();
@@ -679,5 +680,22 @@ export class StoreService {
     if (Array.isArray(data.auditLogs)) {
       this.auditLogs = data.auditLogs;
     }
+  }
+
+  /**
+   * Initializes persistent storage on startup by loading the disk snapshot if present.
+   */
+  public static async initializePersistence(fileName = 'engine-snapshot.json'): Promise<boolean> {
+    try {
+      const store = new PersistentStoreService();
+      const data = await store.loadSnapshot<Record<string, any> | null>(fileName, null);
+      if (data) {
+        this.importAll(data);
+        return true;
+      }
+    } catch (err) {
+      console.warn('Failed to load storage snapshot on startup:', err);
+    }
+    return false;
   }
 }
