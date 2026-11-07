@@ -33,6 +33,7 @@ export const globalRateLimiter = new SlidingWindowRateLimiter({ windowMs: 60_000
 export const createApp = (): Express => {
   const app = express();
 
+  app.set('trust proxy', 1);
   app.use(requestIdMiddleware);
   app.use(securityHeadersMiddleware());
   app.use(cors());

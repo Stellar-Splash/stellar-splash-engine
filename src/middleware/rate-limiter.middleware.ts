@@ -26,8 +26,11 @@ export class SlidingWindowRateLimiter {
     this.keyGenerator =
       options.keyGenerator ??
       ((req: Request) => {
+        if (req.app?.get('trust proxy')) {
+          return req.ip || '127.0.0.1';
+        }
         const forwarded = req.headers['x-forwarded-for'];
-        if (typeof forwarded === 'string') {
+        if (typeof forwarded === 'string' && process.env.NODE_ENV !== 'production') {
           return forwarded.split(',')[0].trim();
         }
         return req.ip || req.socket.remoteAddress || '127.0.0.1';
