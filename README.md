@@ -5,6 +5,8 @@
 [![Stellar Network](https://img.shields.io/badge/Stellar-Testnet-08B5E5.svg)](https://stellar.org)
 [![Live Frontend](https://img.shields.io/badge/Frontend-Netlify-blue.svg)](https://stellar-splash.netlify.app)
 [![Contract Deployed](https://img.shields.io/badge/Soroban-CACHWJEZ...7QYJ-brightgreen.svg)](https://lab.stellar.org/r/testnet/contract/CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ)
+[![Tests Passing](https://img.shields.io/badge/Tests-256%2F256%20Passing-brightgreen.svg)](https://github.com/Stellar-Splash/stellar-splash-engine)
+[![Security Hardened](https://img.shields.io/badge/Security-Hardened-brightgreen.svg)](https://github.com/Stellar-Splash/stellar-splash-engine)
 
 The backend orchestration and verification layer for the Stellar Splash gaming platform. It manages tournament lifecycles, issues anti-cheat session tokens, computes deterministic scores from raw game events, verifies real Stellar Testnet funding transactions, and reconciles prize pools against on-chain ledger records.
 
@@ -105,6 +107,14 @@ Provides dedicated REST endpoints for player payout histories, indexing on-chain
 
 ---
 
+### 🛡️ Security Architecture & Anti-Cheat Controls
+- **Statistical Anomaly Detection (`AnomalyDetectorService`)**: Replay verification inspects timestamp intervals, variance, spatial distribution, click trajectory, and impossible reaction bounds (<60ms). Replays with `riskScore >= 90` are automatically rejected to eliminate macro/bot tampering.
+- **OWASP Security Headers**: Global `securityHeadersMiddleware` injects strict defense headers including HSTS (`Strict-Transport-Security: max-age=31536000; includeSubDomains`), Content Security Policy (`CSP`), `X-Content-Type-Options: nosniff`, and `X-Frame-Options: DENY`.
+- **Proxy-Aware Rate Limiting**: Hardened with `app.set('trust proxy', 1)`, providing accurate client IP tracking behind load balancers/reverse proxies, paired with HMAC-authenticated bypass headers (`X-Engine-Bypass-Token`).
+- **Role-Based Access Control**: `adminAuthMiddleware` protects sensitive administrative actions (channel account registration, privileged settlement authorization).
+
+---
+
 ## 📋 REST API Reference
 
 ### Tournaments
@@ -115,7 +125,7 @@ Provides dedicated REST endpoints for player payout histories, indexing on-chain
 - `GET /api/tournaments/:id/leaderboard`: Query live leaderboard distinguishing **Current Score** from **Final Verified Result**.
 
 ### Result Verification & Attestations
-- `POST /api/verification/match/:id`: Trigger independent replay verification of a completed match.
+- `POST /api/verification/match/:id`: Trigger independent replay verification of a completed match, with automated statistical anomaly detection (`riskScore >= 90` rejection).
 - `GET /api/verification/match/:id`: Retrieve verification record and signed cryptographic attestation.
 
 ### Tournament Rankings
@@ -132,8 +142,8 @@ Provides dedicated REST endpoints for player payout histories, indexing on-chain
 ### Settlements & Multi-Recipient Payouts
 - `GET /api/settlements/:tournamentId/eligibility`: Evaluate strict 5-point settlement eligibility pipeline.
 - `GET /api/settlements/:tournamentId/preview`: Preview deterministic basis-point allocations, residual dust handling, and accounting invariants.
-- `POST /api/settlements/:tournamentId/authorize`: Cryptographically authorize settlement against exact agreement and ranking commitments.
-- `POST /api/settlements/:tournamentId/execute`: Submit multi-recipient Stellar Testnet transfers with real transaction tracking.
+- `POST /api/settlements/:tournamentId/authorize`: Cryptographically authorize settlement against exact agreement and ranking commitments (creator/admin authorized).
+- `POST /api/settlements/:tournamentId/execute`: Submit multi-recipient Stellar Testnet transfers with real transaction tracking (creator/admin authorized).
 - `GET /api/settlements/:tournamentId`: Retrieve settlement record and reconciliation status.
 - `POST /api/settlements/:settlementId/reconcile`: Trigger independent verification comparing expected vs observed on-chain allocations.
 - `GET /api/settlements/player/:playerWallet`: Retrieve player's historical payouts with explorer links.
@@ -151,13 +161,20 @@ Run the automated test suite covering all modules:
 npm test
 ```
 
-All 39 unit and integration tests execute cleanly:
+All 256 unit, integration, and security tests across 72 test suites execute cleanly:
 - `tournament.test.ts`
 - `scoring.test.ts`
 - `verification.test.ts`
 - `ranking.test.ts`
 - `agreement.test.ts`
 - `settlement.test.ts`
+- `anomaly-detector.test.ts`
+- `security-headers.test.ts`
+- `admin-auth.test.ts`
+- `rate-limiter.test.ts`
+- `account-synchronizer.test.ts`
+- `circuit-breaker.test.ts`
+- ...and 60 additional test suites covering edge cases and concurrency.
 
 ---
 
