@@ -94,7 +94,9 @@ export class AnomalyDetectorService {
       // Fixed macro delays exhibit almost zero variance (std dev < 3ms).
       if (intervalStdDev < 4 && averageIntervalMs < 500) {
         riskScore += 50;
-        flags.push(`SYNTHETIC_INTERVAL_REGULARITY: Standard deviation ${intervalStdDev}ms indicates automated macro`);
+        flags.push(
+          `SYNTHETIC_INTERVAL_REGULARITY: Standard deviation ${intervalStdDev}ms indicates automated macro`,
+        );
       }
     }
 
@@ -115,7 +117,9 @@ export class AnomalyDetectorService {
 
     if (perfectCoordinateClumpsCount >= 5) {
       riskScore += 30;
-      flags.push(`REPEATED_EXACT_COORDINATES: ${perfectCoordinateClumpsCount} repeated static pixel hits`);
+      flags.push(
+        `REPEATED_EXACT_COORDINATES: ${perfectCoordinateClumpsCount} repeated static pixel hits`,
+      );
     }
 
     // Normalize risk score to 0..100

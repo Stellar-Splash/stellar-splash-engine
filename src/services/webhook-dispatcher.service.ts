@@ -10,7 +10,11 @@ export class WebhookDispatcherService {
   private registrations: Map<string, WebhookRegistration> = new Map();
   private deliveryHistory: WebhookDeliveryAttempt[] = [];
 
-  public registerWebhook(url: string, events: WebhookEventType[], secret?: string): WebhookRegistration {
+  public registerWebhook(
+    url: string,
+    events: WebhookEventType[],
+    secret?: string,
+  ): WebhookRegistration {
     const id = `wh_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const reg: WebhookRegistration = {
       id,
@@ -36,7 +40,10 @@ export class WebhookDispatcherService {
     return crypto.createHmac('sha256', secret).update(payload).digest('hex');
   }
 
-  public async dispatchEvent(eventType: WebhookEventType, data: Record<string, any>): Promise<WebhookDeliveryAttempt[]> {
+  public async dispatchEvent(
+    eventType: WebhookEventType,
+    data: Record<string, any>,
+  ): Promise<WebhookDeliveryAttempt[]> {
     const eventId = `ev_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const payload: WebhookPayload = {
       eventId,

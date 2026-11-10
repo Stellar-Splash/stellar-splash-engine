@@ -10,11 +10,7 @@ export interface SecurityHeadersConfig {
  * Middleware applying OWASP-recommended HTTP security headers across all API responses.
  */
 export function securityHeadersMiddleware(config: SecurityHeadersConfig = {}) {
-  const {
-    enableHsts = true,
-    enableCsp = true,
-    enableFrameGuard = true,
-  } = config;
+  const { enableHsts = true, enableCsp = true, enableFrameGuard = true } = config;
 
   return (_req: Request, res: Response, next: NextFunction): void => {
     // Prevent MIME-sniffing
@@ -36,18 +32,12 @@ export function securityHeadersMiddleware(config: SecurityHeadersConfig = {}) {
 
     // HTTP Strict Transport Security
     if (enableHsts) {
-      res.setHeader(
-        'Strict-Transport-Security',
-        'max-age=31536000; includeSubDomains; preload'
-      );
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
     }
 
     // Content Security Policy
     if (enableCsp) {
-      res.setHeader(
-        'Content-Security-Policy',
-        "default-src 'self'; frame-ancestors 'none';"
-      );
+      res.setHeader('Content-Security-Policy', "default-src 'self'; frame-ancestors 'none';");
     }
 
     next();

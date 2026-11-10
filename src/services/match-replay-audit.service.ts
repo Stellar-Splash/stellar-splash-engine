@@ -25,10 +25,7 @@ export class MatchReplayAuditService {
   /**
    * Generates a forensic diagnostic package for a match session.
    */
-  public static generatePackage(
-    matchId: string,
-    now: number = Date.now()
-  ): MatchAuditPackage {
+  public static generatePackage(matchId: string, now: number = Date.now()): MatchAuditPackage {
     const session = StoreService.getMatchSession(matchId) || null;
     const result = StoreService.getGameResult(matchId) || null;
 
@@ -40,10 +37,7 @@ export class MatchReplayAuditService {
       timestamp: e.timestamp,
     }));
 
-    const anomalyAnalysis = MatchTickAnomalyService.scanTicks(
-      ticks,
-      session?.endTime || now
-    );
+    const anomalyAnalysis = MatchTickAnomalyService.scanTicks(ticks, session?.endTime || now);
 
     const canonicalString = JSON.stringify({
       matchId,

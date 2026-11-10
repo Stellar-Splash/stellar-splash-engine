@@ -38,7 +38,7 @@ export class DisputeResolutionService {
     reasonCode: number,
     description: string,
     evidenceHash?: string,
-    submittedAt: number = Date.now()
+    submittedAt: number = Date.now(),
   ): DisputeEntry {
     const existing = this.disputes.get(tournamentId);
     if (existing && existing.status === 'ACTIVE') {
@@ -80,7 +80,7 @@ export class DisputeResolutionService {
     tournamentId: string,
     adminWallet: string,
     resolutionNotes: string,
-    resolvedAt: number = Date.now()
+    resolvedAt: number = Date.now(),
   ): DisputeEntry | null {
     const dispute = this.disputes.get(tournamentId);
     if (!dispute || dispute.status !== 'ACTIVE') return null;
@@ -113,7 +113,7 @@ export class DisputeResolutionService {
     tournamentId: string,
     adminWallet: string,
     dismissReason: string,
-    resolvedAt: number = Date.now()
+    resolvedAt: number = Date.now(),
   ): DisputeEntry | null {
     const dispute = this.disputes.get(tournamentId);
     if (!dispute || dispute.status !== 'ACTIVE') return null;

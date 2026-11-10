@@ -1,8 +1,4 @@
-import {
-  PlayerTier,
-  PlayerCareerStatsInput,
-  PlayerTierEvaluation,
-} from '../types/player-tier';
+import { PlayerTier, PlayerCareerStatsInput, PlayerTierEvaluation } from '../types/player-tier';
 
 export { PlayerTier, PlayerCareerStatsInput, PlayerTierEvaluation };
 

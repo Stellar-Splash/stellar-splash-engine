@@ -79,7 +79,7 @@ export class TokenAllowlistCacheService {
     decimals: number,
     issuer?: string,
     ttlMs: number = this.DEFAULT_TTL_MS,
-    currentTime: number = Date.now()
+    currentTime: number = Date.now(),
   ): TokenMetadata {
     const metadata: TokenMetadata = {
       address,
@@ -96,7 +96,10 @@ export class TokenAllowlistCacheService {
   /**
    * Retrieves metadata for an authorized token.
    */
-  public static getTokenMetadata(address: string, currentTime: number = Date.now()): TokenMetadata | null {
+  public static getTokenMetadata(
+    address: string,
+    currentTime: number = Date.now(),
+  ): TokenMetadata | null {
     if (!this.isTokenAllowed(address, currentTime)) {
       return null;
     }

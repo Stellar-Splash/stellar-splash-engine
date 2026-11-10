@@ -6,10 +6,7 @@ export class LedgerSequenceSyncService {
   private rpcUrl: string;
   private maxAllowedLag: number = 3;
 
-  constructor(
-    horizonUrl: string = CONFIG.HORIZON_URL,
-    rpcUrl: string = CONFIG.SOROBAN_RPC_URL
-  ) {
+  constructor(horizonUrl: string = CONFIG.HORIZON_URL, rpcUrl: string = CONFIG.SOROBAN_RPC_URL) {
     this.horizonUrl = horizonUrl;
     this.rpcUrl = rpcUrl;
   }

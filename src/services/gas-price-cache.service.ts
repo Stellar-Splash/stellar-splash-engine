@@ -1,4 +1,8 @@
-import { GasPriceEstimatorService, SorobanOperationType, GasEstimate } from './gas-price-estimator.service';
+import {
+  GasPriceEstimatorService,
+  SorobanOperationType,
+  GasEstimate,
+} from './gas-price-estimator.service';
 
 export interface CachedGasPrice {
   estimate: GasEstimate;
@@ -37,7 +41,7 @@ export class GasPriceCacheService {
   public static getEstimate(
     operation: SorobanOperationType,
     ttlMs: number = this.DEFAULT_TTL_MS,
-    now: number = Date.now()
+    now: number = Date.now(),
   ): GasEstimate {
     const cached = this.cache.get(operation);
     if (cached && now < cached.expiresAt) {

@@ -41,7 +41,7 @@ export class SettlementDaemonController {
     const job = settlementDaemon.registerCompletedTournament(
       tournamentId,
       endedAt,
-      disputeWindowDurationMs
+      disputeWindowDurationMs,
     );
 
     res.json({

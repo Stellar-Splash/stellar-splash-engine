@@ -28,7 +28,10 @@ import { securityHeadersMiddleware } from './middleware/security-headers.middlew
 import { MetricsService } from './services/metrics.service';
 import { CONFIG } from './config';
 
-export const globalRateLimiter = new SlidingWindowRateLimiter({ windowMs: 60_000, maxRequests: 200 });
+export const globalRateLimiter = new SlidingWindowRateLimiter({
+  windowMs: 60_000,
+  maxRequests: 200,
+});
 
 export const createApp = (): Express => {
   const app = express();
@@ -51,7 +54,8 @@ export const createApp = (): Express => {
   // Rate Limiting Status Query Endpoint
   app.get('/api/rate-limit/status', (req: Request, res: Response) => {
     const forwarded = req.headers['x-forwarded-for'];
-    const ip = typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : req.ip || '127.0.0.1';
+    const ip =
+      typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : req.ip || '127.0.0.1';
     const status = globalRateLimiter.getStatus(ip);
     res.json({
       success: true,

@@ -14,14 +14,17 @@ export function adminAuthMiddleware(options: AdminAuthOptions = {}) {
   const isProd = process.env.NODE_ENV === 'production';
   const defaultSecret = isProd ? undefined : 'stellar-splash-super-secret-admin-key-2026';
   const adminSecret = options.customSecret || process.env.ADMIN_SECRET || defaultSecret;
-  const allowedWallets = (options.allowedWallets || (
-    isProd
-      ? (process.env.ADMIN_WALLETS ? process.env.ADMIN_WALLETS.split(',') : [])
+  const allowedWallets = (
+    options.allowedWallets ||
+    (isProd
+      ? process.env.ADMIN_WALLETS
+        ? process.env.ADMIN_WALLETS.split(',')
+        : []
       : [
           'GA2C5RFPE6GCKMY3US5PAB6UZLKIGAHWKXX2GAKVOOUMVQHGASVMOROB',
           'GB7B2W55CDAF7KAZQ7QD3W577G5C2WCK73X42O4WJ4P7G7D8',
-        ]
-  )).map((w) => w.trim().toLowerCase());
+        ])
+  ).map((w) => w.trim().toLowerCase());
 
   return (req: Request, res: Response, next: NextFunction): void => {
     const adminKey =

@@ -15,4 +15,3 @@ export interface EventFilterCriteria {
   topics?: string[][];
   limit?: number;
 }
-

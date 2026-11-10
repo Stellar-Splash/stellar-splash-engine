@@ -41,7 +41,9 @@ export class EventStreamController {
 
   public static async queryContractEvents(req: Request, res: Response): Promise<void> {
     try {
-      const startLedger = req.query.startLedger ? parseInt(req.query.startLedger as string) : undefined;
+      const startLedger = req.query.startLedger
+        ? parseInt(req.query.startLedger as string)
+        : undefined;
       const contractIds = req.query.contractId ? [req.query.contractId as string] : undefined;
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
 
@@ -64,4 +66,3 @@ export class EventStreamController {
     }
   }
 }
-

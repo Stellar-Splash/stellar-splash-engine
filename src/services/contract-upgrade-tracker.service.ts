@@ -49,7 +49,7 @@ export class ContractUpgradeTrackerService {
     admin: string,
     ledger: number,
     protocolVersion: number = 21,
-    timestamp: number = Date.now()
+    timestamp: number = Date.now(),
   ): UpgradeRecord {
     const nextVersion = this.history.length + 1;
     const record: UpgradeRecord = {

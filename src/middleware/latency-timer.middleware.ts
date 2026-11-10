@@ -8,11 +8,7 @@ export const RESPONSE_TIME_HEADER = 'x-response-time';
  * Calculates elapsed execution time and emits X-Response-Time header while
  * feeding route metrics into Prometheus telemetry.
  */
-export const latencyTimerMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): void => {
+export const latencyTimerMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   const startNano = process.hrtime.bigint();
 
   // Intercept writeHead to ensure header is injected before headers are sent to socket

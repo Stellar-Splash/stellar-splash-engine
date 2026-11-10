@@ -45,7 +45,8 @@ export class TournamentRefundWorker {
       }
 
       const isCancelled = t.state === 'CANCELLED';
-      const isUncontested = t.state === 'FINALIZED' && (t.currentParticipants === 0 || !t.currentParticipants);
+      const isUncontested =
+        t.state === 'FINALIZED' && (t.currentParticipants === 0 || !t.currentParticipants);
 
       if ((isCancelled || isUncontested) && t.prizePoolAmount > 0) {
         const reason = isCancelled ? 'TOURNAMENT_CANCELLED' : 'ZERO_PARTICIPANTS_UNCONTESTED';

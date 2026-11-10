@@ -22,9 +22,7 @@ describe('Grafana Dashboard Specification', () => {
     const raw = fs.readFileSync(dashboardPath, 'utf-8');
     const dashboard = JSON.parse(raw);
 
-    const panelQueries = dashboard.panels.flatMap((p: any) =>
-      p.targets.map((t: any) => t.expr),
-    );
+    const panelQueries = dashboard.panels.flatMap((p: any) => p.targets.map((t: any) => t.expr));
 
     const joinedQueries = panelQueries.join(' ');
     expect(joinedQueries).toContain('sse_active_clients_total');

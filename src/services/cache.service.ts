@@ -142,11 +142,7 @@ export class CacheService<T = any> {
   /**
    * Retrieves or computes a cached value atomically.
    */
-  public async getOrSet(
-    key: string,
-    producer: () => Promise<T>,
-    ttlMs?: number,
-  ): Promise<T> {
+  public async getOrSet(key: string, producer: () => Promise<T>, ttlMs?: number): Promise<T> {
     const cached = this.get(key);
     if (cached !== undefined) {
       return cached;

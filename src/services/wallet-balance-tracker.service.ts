@@ -100,4 +100,3 @@ export class WalletBalanceTrackerService {
 }
 
 export const walletBalanceTracker = new WalletBalanceTrackerService();
-

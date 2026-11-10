@@ -9,4 +9,3 @@ router.get('/queue', ChannelAccountController.getQueue);
 router.post('/register', adminAuthMiddleware(), ChannelAccountController.registerChannel);
 
 export default router;
-

@@ -28,7 +28,7 @@ export class AuditExportService {
    */
   public static generateReport(
     tournamentId: string,
-    generatedAt: number = Date.now()
+    generatedAt: number = Date.now(),
   ): AuditExportReport {
     const tournament = StoreService.getTournamentById(tournamentId) || null;
     const ranking = StoreService.getRanking(tournamentId) || null;

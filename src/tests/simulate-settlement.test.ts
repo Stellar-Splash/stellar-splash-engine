@@ -16,4 +16,3 @@ describe('Settlement Flow Simulator', () => {
     expect(res.totalDisbursed + res.remainder).toBe(1001);
   });
 });
-

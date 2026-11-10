@@ -1,4 +1,8 @@
-import { PlayerInputTelemetry, AntiCheatEntropyReport, TrajectoryPoint } from '../types/anti-cheat-entropy';
+import {
+  PlayerInputTelemetry,
+  AntiCheatEntropyReport,
+  TrajectoryPoint,
+} from '../types/anti-cheat-entropy';
 
 export class AntiCheatEntropyService {
   /**
@@ -52,10 +56,7 @@ export class AntiCheatEntropyService {
 
     let totalPathLength = 0;
     for (let i = 1; i < points.length; i++) {
-      totalPathLength += Math.hypot(
-        points[i].x - points[i - 1].x,
-        points[i].y - points[i - 1].y
-      );
+      totalPathLength += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
     }
 
     if (totalPathLength === 0) return 0;

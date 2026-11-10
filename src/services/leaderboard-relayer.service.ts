@@ -1,4 +1,8 @@
-import { LeaderboardEntry, LiveLeaderboardSnapshot, RankDeltaNotification } from '../types/leaderboard-relayer';
+import {
+  LeaderboardEntry,
+  LiveLeaderboardSnapshot,
+  RankDeltaNotification,
+} from '../types/leaderboard-relayer';
 
 export class LeaderboardRelayerService {
   private tournamentLeaderboards: Map<number, LeaderboardEntry[]> = new Map();
@@ -8,7 +12,7 @@ export class LeaderboardRelayerService {
     tournamentId: number,
     playerWallet: string,
     score: number,
-    winRateBps: number = 0
+    winRateBps: number = 0,
   ): RankDeltaNotification | null {
     let board = this.tournamentLeaderboards.get(tournamentId) || [];
     const prevIndex = board.findIndex((e) => e.playerWallet === playerWallet);

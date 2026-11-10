@@ -26,26 +26,33 @@ export class SolvencyMonitorWorker {
    */
   public static checkSolvency(
     vaultBalanceOverride?: number,
-    now: number = Date.now()
+    now: number = Date.now(),
   ): SolvencyEvaluationResult {
     const tournaments = StoreService.getAllTournaments();
 
     // Active obligations are prizePoolAmounts of tournaments that are OPEN, IN_PROGRESS, or RESULTS_PENDING
-    const activeStates = ['FUNDING', 'OPEN', 'FULL', 'IN_PROGRESS', 'RESULTS_PENDING', 'VERIFYING', 'FINALIZED'];
+    const activeStates = [
+      'FUNDING',
+      'OPEN',
+      'FULL',
+      'IN_PROGRESS',
+      'RESULTS_PENDING',
+      'VERIFYING',
+      'FINALIZED',
+    ];
     const activeTournaments = tournaments.filter((t) => activeStates.includes(t.state));
 
     const totalObligations = activeTournaments.reduce(
       (sum, t) => sum + (t.prizePoolAmount || 0),
-      0
+      0,
     );
 
     // Default simulated balance matches obligations unless overridden
-    const vaultBalance = vaultBalanceOverride !== undefined ? vaultBalanceOverride : totalObligations;
+    const vaultBalance =
+      vaultBalanceOverride !== undefined ? vaultBalanceOverride : totalObligations;
 
     const ratioPct =
-      totalObligations > 0
-        ? Math.round((vaultBalance / totalObligations) * 100)
-        : 100;
+      totalObligations > 0 ? Math.round((vaultBalance / totalObligations) * 100) : 100;
 
     const isSolvent = vaultBalance >= totalObligations;
     const deficitAmount = isSolvent ? 0 : totalObligations - vaultBalance;

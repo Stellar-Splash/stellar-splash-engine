@@ -35,7 +35,10 @@ describe('latencyTimerMiddleware', () => {
 
     // Trigger writeHead
     (res as any).writeHead(200);
-    expect(res.setHeader).toHaveBeenCalledWith('X-Response-Time', expect.stringMatching(/^\d+(\.\d+)?ms$/));
+    expect(res.setHeader).toHaveBeenCalledWith(
+      'X-Response-Time',
+      expect.stringMatching(/^\d+(\.\d+)?ms$/),
+    );
 
     // Emit response finish
     emitter.emit('finish');

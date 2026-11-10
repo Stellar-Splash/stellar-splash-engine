@@ -46,7 +46,7 @@ export class RateLimitTierService {
   public static checkLimit(
     identifier: string,
     tier: RateLimitTier = 'ANONYMOUS',
-    now: number = Date.now()
+    now: number = Date.now(),
   ): RateLimitDecision {
     const config = this.TIER_LIMITS[tier];
     const timestamps = this.requestLogs.get(identifier) || [];
@@ -58,7 +58,8 @@ export class RateLimitTierService {
     const remaining = Math.max(0, config.maxRequests - count);
 
     const oldestTimestamp = validTimestamps[0] ?? now;
-    const resetAfterMs = validTimestamps.length > 0 ? Math.max(0, oldestTimestamp + config.windowMs - now) : 0;
+    const resetAfterMs =
+      validTimestamps.length > 0 ? Math.max(0, oldestTimestamp + config.windowMs - now) : 0;
 
     return {
       allowed,
@@ -75,7 +76,7 @@ export class RateLimitTierService {
   public static recordRequest(
     identifier: string,
     tier: RateLimitTier = 'ANONYMOUS',
-    now: number = Date.now()
+    now: number = Date.now(),
   ): RateLimitDecision {
     const decision = this.checkLimit(identifier, tier, now);
     if (!decision.allowed) {

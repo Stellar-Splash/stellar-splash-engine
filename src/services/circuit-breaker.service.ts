@@ -14,11 +14,11 @@ export class CircuitBreakerService {
   private lastTripTimestamp?: number;
   private config: CircuitBreakerConfig;
 
-  constructor(
-    nodes?: string[],
-    config: Partial<CircuitBreakerConfig> = {}
-  ) {
-    const defaultUrls = nodes && nodes.length > 0 ? nodes : [CONFIG.SOROBAN_RPC_URL, 'https://soroban-testnet.stellar.org'];
+  constructor(nodes?: string[], config: Partial<CircuitBreakerConfig> = {}) {
+    const defaultUrls =
+      nodes && nodes.length > 0
+        ? nodes
+        : [CONFIG.SOROBAN_RPC_URL, 'https://soroban-testnet.stellar.org'];
     this.nodes = defaultUrls.map((url, idx) => ({
       url,
       name: `rpc-node-${idx + 1}`,
@@ -56,7 +56,10 @@ export class CircuitBreakerService {
     current.consecutiveFailures = 0;
     current.lastLatencyMs = latencyMs;
     // Rolling p95 approximation
-    current.p95LatencyMs = current.p95LatencyMs === 0 ? latencyMs : Math.round(current.p95LatencyMs * 0.95 + latencyMs * 0.05);
+    current.p95LatencyMs =
+      current.p95LatencyMs === 0
+        ? latencyMs
+        : Math.round(current.p95LatencyMs * 0.95 + latencyMs * 0.05);
 
     if (this.state === 'HALF_OPEN') {
       this.state = 'CLOSED';
@@ -85,7 +88,10 @@ export class CircuitBreakerService {
     // Attempt to select next healthy node
     for (let i = 0; i < this.nodes.length; i++) {
       const nextIdx = (this.activeNodeIndex + 1 + i) % this.nodes.length;
-      if (this.nodes[nextIdx].isHealthy || this.nodes[nextIdx].consecutiveFailures < this.config.failureThreshold) {
+      if (
+        this.nodes[nextIdx].isHealthy ||
+        this.nodes[nextIdx].consecutiveFailures < this.config.failureThreshold
+      ) {
         this.activeNodeIndex = nextIdx;
         return;
       }

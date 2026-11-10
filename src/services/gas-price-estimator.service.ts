@@ -68,7 +68,7 @@ export class GasPriceEstimatorService {
    */
   public static estimateFee(
     operation: SorobanOperationType,
-    level: CongestionLevel = this.currentCongestion
+    level: CongestionLevel = this.currentCongestion,
   ): GasEstimate {
     const profile = this.PROFILES[operation] || {
       cpuInstructions: 1_000_000,

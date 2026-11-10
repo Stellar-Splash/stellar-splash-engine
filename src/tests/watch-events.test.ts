@@ -7,7 +7,7 @@ describe('Contract Event Watcher Filter', () => {
     const rawEvents = [
       { topic: 'player_entered', data: { player: 'GCQ3...' } },
       { topic: 'unknown_event', data: {} },
-      { topic: 'tournament_settled', data: { tournamentId: 101 } }
+      { topic: 'tournament_settled', data: { tournamentId: 101 } },
     ];
 
     const filtered = filterContractEvents(rawEvents);
@@ -17,7 +17,8 @@ describe('Contract Event Watcher Filter', () => {
   });
 
   it('contains expected target contract address', () => {
-    expect(WATCH_CONFIG.contractId).toBe('CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ');
+    expect(WATCH_CONFIG.contractId).toBe(
+      'CACHWJEZY6JN36VFACWRQ7FP4T5EPRRRNBVLOSFHXTJHETZY36JD7QYJ',
+    );
   });
 });
-

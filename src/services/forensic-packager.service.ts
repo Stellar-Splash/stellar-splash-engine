@@ -51,7 +51,10 @@ export class ForensicPackagerService {
     return this.packages.get(matchId);
   }
 
-  public static verifyPackageIntegrity(pkg: ForensicReplayPackage, secret: string = 'STELLAR_SPLASH_FORENSIC_AUTHORITY_SECRET'): boolean {
+  public static verifyPackageIntegrity(
+    pkg: ForensicReplayPackage,
+    secret: string = 'STELLAR_SPLASH_FORENSIC_AUTHORITY_SECRET',
+  ): boolean {
     const rawPayload = `${pkg.matchId}:${pkg.tournamentId}:${pkg.seed}:${pkg.tickCount}:${JSON.stringify(pkg.finalScores)}`;
     const expectedHash = crypto.createHash('sha256').update(rawPayload).digest('hex');
     if (expectedHash !== pkg.verificationHash) return false;

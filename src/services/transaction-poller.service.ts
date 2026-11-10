@@ -73,4 +73,3 @@ export class TransactionStatusPollerService {
 }
 
 export const transactionStatusPoller = new TransactionStatusPollerService();
-

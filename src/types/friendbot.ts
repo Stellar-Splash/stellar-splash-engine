@@ -9,4 +9,3 @@ export interface FriendbotFundingResult {
   error?: string;
   fundedAt: number;
 }
-

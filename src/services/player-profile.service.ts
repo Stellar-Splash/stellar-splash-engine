@@ -41,7 +41,7 @@ export class PlayerProfileService {
     score: number,
     rank: number,
     prizeWon: number = 0,
-    completedAt: number = Date.now()
+    completedAt: number = Date.now(),
   ): PlayerMatchRecord {
     const record: PlayerMatchRecord = {
       tournamentId,
@@ -116,8 +116,6 @@ export class PlayerProfileService {
    */
   public static getMatchHistory(playerWallet: string, limit: number = 20): PlayerMatchRecord[] {
     const history = this.matchHistory.get(playerWallet) || [];
-    return [...history]
-      .sort((a, b) => b.completedAt - a.completedAt)
-      .slice(0, limit);
+    return [...history].sort((a, b) => b.completedAt - a.completedAt).slice(0, limit);
   }
 }

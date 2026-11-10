@@ -18,4 +18,3 @@ export interface EngineReplayPacket {
   seed: string;
   entropy: number;
 }
-

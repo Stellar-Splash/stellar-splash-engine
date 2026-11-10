@@ -34,7 +34,7 @@ export class MatchTickAnomalyService {
    */
   public static scanTicks(
     ticks: MatchTickItem[],
-    matchEndTime: number = Infinity
+    matchEndTime: number = Infinity,
   ): AnomalyScanReport {
     const anomalies: AnomalyDetail[] = [];
     let lastFireTimestamp = -Infinity;

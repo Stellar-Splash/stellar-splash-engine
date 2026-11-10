@@ -59,8 +59,15 @@ export class ReplayBundleValidationService {
       return { isValid: false, error: 'Missing finalScores map' };
     }
 
-    if (!b.stateRootSha256 || typeof b.stateRootSha256 !== 'string' || !/^[0-9a-fA-F]{64}$/.test(b.stateRootSha256)) {
-      return { isValid: false, error: 'stateRootSha256 must be a 64-character hexadecimal SHA-256 hash' };
+    if (
+      !b.stateRootSha256 ||
+      typeof b.stateRootSha256 !== 'string' ||
+      !/^[0-9a-fA-F]{64}$/.test(b.stateRootSha256)
+    ) {
+      return {
+        isValid: false,
+        error: 'stateRootSha256 must be a 64-character hexadecimal SHA-256 hash',
+      };
     }
 
     if (!Array.isArray(b.ticks) || b.ticks.length === 0) {
@@ -71,9 +78,16 @@ export class ReplayBundleValidationService {
     for (let i = 0; i < b.ticks.length; i++) {
       const tick = b.ticks[i];
       if (typeof tick.tickIndex !== 'number' || tick.tickIndex !== i) {
-        return { isValid: false, error: `Invalid tick index at position ${i}: expected ${i}, got ${tick?.tickIndex}` };
+        return {
+          isValid: false,
+          error: `Invalid tick index at position ${i}: expected ${i}, got ${tick?.tickIndex}`,
+        };
       }
-      if (typeof tick.playerIndex !== 'number' || tick.playerIndex < 0 || tick.playerIndex >= b.players.length) {
+      if (
+        typeof tick.playerIndex !== 'number' ||
+        tick.playerIndex < 0 ||
+        tick.playerIndex >= b.players.length
+      ) {
         return { isValid: false, error: `Invalid playerIndex ${tick?.playerIndex} at tick ${i}` };
       }
     }
@@ -101,7 +115,7 @@ export class ReplayBundleValidationService {
     matchId: string,
     tournamentId: string,
     players: string[],
-    ticks: ReplayTick[]
+    ticks: ReplayTick[],
   ): string {
     const serialized = JSON.stringify({
       matchId,

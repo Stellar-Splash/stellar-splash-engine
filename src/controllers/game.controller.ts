@@ -19,17 +19,19 @@ const CompleteGameSchema = z.object({
   matchId: z.string(),
   sessionToken: z.string(),
   endTime: z.number().int().positive(),
-  events: z.array(
-    z.object({
-      seq: z.number().int().min(0),
-      timestamp: z.number().int().min(0),
-      type: z.enum(['TARGET_HIT', 'COMBO_STREAK', 'HAZARD_HIT', 'MULTIPLIER_UP']),
-      points: z.number().int().min(-500).max(1000),
-      combo: z.number().int().min(0).max(1000),
-      multiplier: z.number().int().min(1).max(50),
-      data: z.record(z.unknown()).optional(),
-    }),
-  ).max(5000),
+  events: z
+    .array(
+      z.object({
+        seq: z.number().int().min(0),
+        timestamp: z.number().int().min(0),
+        type: z.enum(['TARGET_HIT', 'COMBO_STREAK', 'HAZARD_HIT', 'MULTIPLIER_UP']),
+        points: z.number().int().min(-500).max(1000),
+        combo: z.number().int().min(0).max(1000),
+        multiplier: z.number().int().min(1).max(50),
+        data: z.record(z.unknown()).optional(),
+      }),
+    )
+    .max(5000),
 });
 
 export class GameController {

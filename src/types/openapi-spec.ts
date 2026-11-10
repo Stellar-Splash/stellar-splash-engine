@@ -18,12 +18,18 @@ export interface OpenApiPathItem {
     required?: boolean;
     schema: Record<string, any>;
   }>;
-  responses: Record<string, {
-    description: string;
-    content?: Record<string, {
-      schema: Record<string, any>;
-    }>;
-  }>;
+  responses: Record<
+    string,
+    {
+      description: string;
+      content?: Record<
+        string,
+        {
+          schema: Record<string, any>;
+        }
+      >;
+    }
+  >;
 }
 
 export interface OpenApiDocument {

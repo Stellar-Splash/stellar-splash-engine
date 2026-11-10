@@ -9,7 +9,9 @@ export class LeaderboardStreamController {
     res.setHeader('X-Accel-Buffering', 'no');
     res.flushHeaders?.();
 
-    const tournamentId = req.query.tournamentId ? parseInt(req.query.tournamentId as string) : undefined;
+    const tournamentId = req.query.tournamentId
+      ? parseInt(req.query.tournamentId as string)
+      : undefined;
 
     // Send initial snapshot if tournamentId provided
     if (tournamentId) {
@@ -60,7 +62,7 @@ export class LeaderboardStreamController {
       tournamentId,
       playerWallet,
       score,
-      winRateBps
+      winRateBps,
     );
 
     res.json({

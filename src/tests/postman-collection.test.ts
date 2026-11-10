@@ -3,7 +3,13 @@ import fs from 'fs';
 import path from 'path';
 
 describe('Postman Collection Verification', () => {
-  const collectionPath = path.join(__dirname, '..', '..', 'docs', 'StellarSplash_Engine.postman_collection.json');
+  const collectionPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    'docs',
+    'StellarSplash_Engine.postman_collection.json',
+  );
 
   it('exists and is valid JSON', () => {
     expect(fs.existsSync(collectionPath)).toBe(true);
@@ -22,4 +28,3 @@ describe('Postman Collection Verification', () => {
     expect(groupNames).toContain('Live Events (SSE)');
   });
 });
-

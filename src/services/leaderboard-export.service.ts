@@ -27,7 +27,15 @@ export class LeaderboardExportService {
    * Generates formatted CSV string from leaderboard rows.
    */
   public static exportCsv(tournamentId: string, entries: LeaderboardExportRow[]): string {
-    const headers = ['Rank', 'Player Wallet', 'Score', 'Prize Share (Bps)', 'Prize Amount', 'Asset', 'Status'];
+    const headers = [
+      'Rank',
+      'Player Wallet',
+      'Score',
+      'Prize Share (Bps)',
+      'Prize Amount',
+      'Asset',
+      'Status',
+    ];
     const lines = [headers.join(',')];
 
     for (const e of entries) {
@@ -40,7 +48,7 @@ export class LeaderboardExportService {
           e.prizeAmount.toFixed(4),
           `"${e.asset}"`,
           `"${e.status}"`,
-        ].join(',')
+        ].join(','),
       );
     }
 
@@ -56,7 +64,7 @@ export class LeaderboardExportService {
     prizeAsset: string,
     totalPrizePool: number,
     entries: LeaderboardExportRow[],
-    exportedAt: number = Date.now()
+    exportedAt: number = Date.now(),
   ): string {
     const payload: LeaderboardJsonExport = {
       tournamentId,

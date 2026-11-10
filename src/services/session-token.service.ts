@@ -26,7 +26,7 @@ export class SessionTokenService {
     tournamentId: string,
     playerWallet: string,
     ttlMs: number = this.DEFAULT_TTL_MS,
-    issuedAt: number = Date.now()
+    issuedAt: number = Date.now(),
   ): SessionToken {
     const token = randomBytes(24).toString('hex');
     const sessionToken: SessionToken = {
@@ -61,7 +61,7 @@ export class SessionTokenService {
     tokenString: string,
     matchId: string,
     playerWallet: string,
-    currentTime: number = Date.now()
+    currentTime: number = Date.now(),
   ): boolean {
     const session = this.tokens.get(tokenString);
     if (!session) return false;

@@ -40,7 +40,7 @@ export class ChannelAccountManagerService {
   }
 
   public enqueueSubmission(
-    item: Omit<SubmissionQueueItem, 'id' | 'enqueuedAt' | 'attempts' | 'status'>
+    item: Omit<SubmissionQueueItem, 'id' | 'enqueuedAt' | 'attempts' | 'status'>,
   ): SubmissionQueueItem {
     const id = `sub_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const submission: SubmissionQueueItem = {
@@ -69,7 +69,7 @@ export class ChannelAccountManagerService {
     id: string,
     status: SubmissionQueueItem['status'],
     txHash?: string,
-    error?: string
+    error?: string,
   ): void {
     const item = this.submissionQueue.get(id);
     if (item) {
@@ -116,4 +116,3 @@ export class ChannelAccountManagerService {
 }
 
 export const channelAccountManager = new ChannelAccountManagerService();
-

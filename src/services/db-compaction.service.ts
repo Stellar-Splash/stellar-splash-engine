@@ -24,7 +24,7 @@ export class DatabaseCompactionService {
    */
   public static compact(
     options: CompactionOptions = {},
-    now: number = Date.now()
+    now: number = Date.now(),
   ): CompactionReport {
     const auditRetention = options.auditLogRetentionMs ?? this.DEFAULT_AUDIT_RETENTION_MS;
     const draftRetention = options.staleDraftMatchRetentionMs ?? this.DEFAULT_DRAFT_RETENTION_MS;
@@ -37,7 +37,7 @@ export class DatabaseCompactionService {
     // 1. Prune old audit logs
     const initialAuditCount = (state.auditLogs || []).length;
     const retainedAuditLogs = (state.auditLogs || []).filter(
-      (log: any) => log.timestamp >= auditCutoff
+      (log: any) => log.timestamp >= auditCutoff,
     );
     const prunedAuditLogs = initialAuditCount - retainedAuditLogs.length;
 

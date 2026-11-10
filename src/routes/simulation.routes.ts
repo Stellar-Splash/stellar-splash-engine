@@ -6,4 +6,3 @@ const router = Router();
 router.post('/simulate', SimulationController.simulate);
 
 export default router;
-

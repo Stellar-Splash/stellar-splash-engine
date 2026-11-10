@@ -31,7 +31,7 @@ export class PlayerLeaderboardCacheService {
     tournamentId: string,
     rankings: CachedLeaderboardEntry[],
     ttlMs: number = this.DEFAULT_TTL_MS,
-    currentTime: number = Date.now()
+    currentTime: number = Date.now(),
   ): void {
     this.cache.set(tournamentId, {
       rankings: [...rankings],
@@ -44,7 +44,7 @@ export class PlayerLeaderboardCacheService {
    */
   public static getLeaderboard(
     tournamentId: string,
-    currentTime: number = Date.now()
+    currentTime: number = Date.now(),
   ): CachedLeaderboardEntry[] | null {
     const item = this.cache.get(tournamentId);
     if (!item) return null;

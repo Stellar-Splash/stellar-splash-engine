@@ -39,7 +39,7 @@ export class EntryFeeReconciliationService {
     playerAddress: string,
     amount: bigint,
     txHash: string,
-    recordedAt: number = Date.now()
+    recordedAt: number = Date.now(),
   ): EntryFeePayment {
     if (!this.paymentsByTournament.has(tournamentId)) {
       this.paymentsByTournament.set(tournamentId, new Map());
@@ -82,7 +82,7 @@ export class EntryFeeReconciliationService {
   public static getReconciliationSummary(
     tournamentId: string,
     expectedFeePerPlayer: bigint,
-    expectedPlayerCount: number
+    expectedPlayerCount: number,
   ): ReconciliationReport {
     const payments = this.getPayments(tournamentId);
     const collectedCount = payments.length;

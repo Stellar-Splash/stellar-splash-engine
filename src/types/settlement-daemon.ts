@@ -3,7 +3,8 @@ export interface SettlementJob {
   contractId: string;
   endedAt: number;
   disputeWindowExpiresAt: number;
-  status: 'PENDING_DISPUTE' | 'READY_FOR_SETTLEMENT' | 'PROCESSING' | 'SETTLED' | 'DISPUTED' | 'FAILED';
+  status:
+    'PENDING_DISPUTE' | 'READY_FOR_SETTLEMENT' | 'PROCESSING' | 'SETTLED' | 'DISPUTED' | 'FAILED';
   txHash?: string;
   error?: string;
   attempts: number;

@@ -8,4 +8,3 @@ router.get('/recent', EventStreamController.getRecentEvents);
 router.get('/query', EventStreamController.queryContractEvents);
 
 export default router;
-

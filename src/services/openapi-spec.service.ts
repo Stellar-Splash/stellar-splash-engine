@@ -24,7 +24,9 @@ export class OpenApiSpecService {
             summary: 'Engine health and telemetry probe',
             tags: ['System'],
             responses: {
-              '200': { description: 'Engine operational status, memory, uptime, and Soroban contract ID' },
+              '200': {
+                description: 'Engine operational status, memory, uptime, and Soroban contract ID',
+              },
             },
           },
         },

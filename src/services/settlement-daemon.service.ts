@@ -13,7 +13,7 @@ export class SettlementDaemonService {
   public registerCompletedTournament(
     tournamentId: number,
     endedAt: number = Date.now(),
-    disputeWindowDurationMs: number = 3600_000 // 1 hour default
+    disputeWindowDurationMs: number = 3600_000, // 1 hour default
   ): SettlementJob {
     const existing = this.jobs.get(tournamentId);
     if (existing) return existing;
@@ -79,7 +79,11 @@ export class SettlementDaemonService {
   public getStats(): SettlementDaemonStats {
     let active = 0;
     for (const job of this.jobs.values()) {
-      if (job.status === 'PENDING_DISPUTE' || job.status === 'READY_FOR_SETTLEMENT' || job.status === 'PROCESSING') {
+      if (
+        job.status === 'PENDING_DISPUTE' ||
+        job.status === 'READY_FOR_SETTLEMENT' ||
+        job.status === 'PROCESSING'
+      ) {
         active++;
       }
     }

@@ -52,4 +52,3 @@ export class FriendbotService {
 }
 
 export const friendbotService = new FriendbotService();
-

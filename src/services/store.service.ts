@@ -465,7 +465,7 @@ export class StoreService {
     eventType: string,
     actor: string,
     details: Record<string, unknown>,
-    timestamp: number = Date.now()
+    timestamp: number = Date.now(),
   ): void {
     this.auditLogs.push({
       id: `audit-${timestamp}-${Math.floor(Math.random() * 10000)}`,

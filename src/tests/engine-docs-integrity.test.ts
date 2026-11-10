@@ -17,4 +17,3 @@ describe('Engine Documentation Integrity', () => {
     expect(checklist).toContain('Channel Account Treasury');
   });
 });
-

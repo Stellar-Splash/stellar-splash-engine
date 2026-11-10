@@ -39,7 +39,7 @@ export class MatchAttestationService {
     tournamentId: string,
     playerWallet: string,
     score: number,
-    resultHash: string
+    resultHash: string,
   ): string {
     const payload = `${matchId}:${tournamentId}:${playerWallet}:${score}:${resultHash}`;
     return createHash('sha256').update(payload).digest('hex');
@@ -54,9 +54,15 @@ export class MatchAttestationService {
     playerWallet: string,
     score: number,
     resultHash: string,
-    createdAt: number = Date.now()
+    createdAt: number = Date.now(),
   ): MatchAttestation {
-    const attestationDigest = this.computeDigest(matchId, tournamentId, playerWallet, score, resultHash);
+    const attestationDigest = this.computeDigest(
+      matchId,
+      tournamentId,
+      playerWallet,
+      score,
+      resultHash,
+    );
     const attestationId = `attest-${attestationDigest.slice(0, 16)}`;
 
     const attestation: MatchAttestation = {
@@ -83,7 +89,7 @@ export class MatchAttestationService {
     attestationId: string,
     txHash: string,
     ledger: number,
-    updatedAt: number = Date.now()
+    updatedAt: number = Date.now(),
   ): MatchAttestation | null {
     const record = this.attestations.get(attestationId);
     if (!record) return null;
@@ -103,7 +109,7 @@ export class MatchAttestationService {
   public static markDisputed(
     attestationId: string,
     disputeReason: string,
-    updatedAt: number = Date.now()
+    updatedAt: number = Date.now(),
   ): MatchAttestation | null {
     const record = this.attestations.get(attestationId);
     if (!record) return null;
@@ -119,7 +125,10 @@ export class MatchAttestationService {
   /**
    * Updates attestation state to SETTLED upon tournament payout finalization.
    */
-  public static markSettled(attestationId: string, updatedAt: number = Date.now()): MatchAttestation | null {
+  public static markSettled(
+    attestationId: string,
+    updatedAt: number = Date.now(),
+  ): MatchAttestation | null {
     const record = this.attestations.get(attestationId);
     if (!record) return null;
 
